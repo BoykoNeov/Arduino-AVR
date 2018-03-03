@@ -1,4 +1,3 @@
-
 byte cursor_flag = 0;
 byte incomingByte = 0;  
 byte cursor_position = 0;
@@ -69,30 +68,35 @@ void setup()
 }
 
 
-void clear_screen() {
+void clear_screen() 
+{
   digitalWrite (rs_select, LOW);
-incomingByte = B00000001;
-write_bits();
-delay (40);
+  incomingByte = B00000001;
+  write_bits();
+  delay (40);
 }  // setup end
 
-void write_bits() {
-write_high_bits();
-write_low_bits();
+void write_bits() 
+{
+  write_high_bits();
+  write_low_bits();
 }
 
-void write_low_bits() {
+void write_low_bits() 
+{
   int array_loop=0 ;
-  for (int bit_loop=3;  bit_loop >-1; bit_loop--) {                             //loop for reading the lower 4 bits
+  for (int bit_loop=3;  bit_loop >-1; bit_loop--) //loop for reading the lower 4 bits
+  {                             
     digitalWrite (pinArray[array_loop+1], bitRead(incomingByte, bit_loop));      //output the read 4 bits to pins d7 to d4
     array_loop++ ;
   }
-                digitalWrite (enable, LOW);
-                delayMicroseconds(4);
-                digitalWrite (enable, HIGH);                   // pulse enable
-                 delayMicroseconds(4);
-                digitalWrite (enable, LOW);
-                 delayMicroseconds(4);
+  
+    digitalWrite (enable, LOW);
+    delayMicroseconds(4);
+    digitalWrite (enable, HIGH);                   // pulse enable
+    delayMicroseconds(4);
+    digitalWrite (enable, LOW);
+    delayMicroseconds(4);
 }
 
 
@@ -125,8 +129,8 @@ void write_custom_c()
 
 void loop() 
 {        
-//                Serial.print ("cursor_position = ");
-//                Serial.println (cursor_position);
+// Serial.print ("cursor_position = ");
+// Serial.println (cursor_position);
 
 // serial_bit_control();
 // write_millis();         //write millis on the screen
@@ -226,11 +230,9 @@ void serial_bit_control()
                 
       Serial.print ("d7 = ");
       Serial.println (digitalRead(d7));
-
-                //     position_checker_for_serial_bit();
-
-                }
-                }
+      //     position_checker_for_serial_bit();
+      }
+}
                 
 
 // void position_checker_for_serial_bit()

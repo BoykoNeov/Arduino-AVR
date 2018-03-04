@@ -1,0 +1,1074 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><!-- <?xml version="1.0"?> --><!-- No "Redirect" defined -->
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="expires" content="now">
+<meta http-equiv="pragma" content="no-cache">
+<meta name="Copyright" content="© 1995-2005 Peter Ouwehand. All Rights Reserved">
+<meta name="Author" content="Peter Ouwehand">
+<meta name="E-mail" content="info-hd.44780@iae.nl">
+<meta name="Description" content="(none)">
+<meta name="KeyWords" content="HD44780, LCD, Liquid Crystal Display, Character LCD, Industry Standard Character LCD, Hitachi, Optrex, Intel, Philips, 8051, PIC, MicroChip, 16C84, Atmel, AT90S2313">
+<meta name="robots" content="index, follow"><!-- <base target="main"> --><!-- <base target="_top"> --><!-- <base target="_blank"> -->
+
+
+
+
+
+
+<link rel="stylesheet" href="lcd0.shtml_files/lcd.css" type="text/css">
+
+<title>How to control a HD44780-based Character-LCD</title></head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+
+
+<!-- nnn -->
+<div>
+<a href="http://ouwehand.net/bot-trap/"><img src="lcd0.shtml_files/line013.htm" style="border: 0px none ; width: 0px; height: 1px;" alt=" "></a>
+</div>
+
+<div class="sitename">
+How to control a HD44780-based Character-LCD
+</div>
+
+<div class="sitesubtitle">
+The Industry Standard Character LCD
+</div>
+
+
+<div class="visitor">
+Visitor #
+
+<img src="lcd0.shtml_files/pouweha7.htm" alt="counter">
+
+</div>
+
+
+<div class="copy">
+<a href="mailto:info-hd.44780@iae.nl?subject=How%20to%20control%20a%20HD44780-based%20Character-LCD">© 1995-2005 Peter Ouwehand.</a><br>
+Last updated on 2005-01-22<br>
+</div>
+
+<!--
+<div style="text-align: center;">
+<a href="http://demo.ffii.org/letter.html"><img src="http://demo.ffii.org/minister_banner60.png" width="468" height="60"  style="border:0;" alt="Dear Minister, please click here!" /></a>
+</div>
+-->
+
+<div class="navigators">
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd.shtml">TOC</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml">General info</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd1.shtml">8051 example</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd2.shtml">PIC example</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd_examp.shtml">Misc. examples</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd_md.shtml">Manuf./Distrib.</a> |
+<a href="http://home.iae.nl/users/pouweha/index.shtml">Home</a> |
+<a href="http://ouwehand.net/%7Epeter/lcd/guestbook/gb_func.php?action=add">Sign Guestbook</a> |
+<a href="http://ouwehand.net/%7Epeter/lcd/guestbook/gb_func.php?action=view">View Guestbook</a>
+</div>
+
+
+
+<div class="pagesubtitle">
+General info and code-examples<br>
+</div>
+
+
+<div class="paragraph_1">
+<a id="TOC"></a>
+TOC
+</div>
+<div class="toc_content">
+
+<ul>
+    <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#general">1. General</a></li>
+    <li>
+    <ul>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#disclaimer">1.1. Disclaimer</a></li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#usage">1.2. Usage</a></li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#purpose">1.3. Purpose</a></li>
+    </ul>
+    </li>
+</ul>
+
+
+<ul>
+    <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#hd44780">2. HD44780-based LCD modules</a></li>
+    <li>
+    <ul>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#pin_assignment">2.1. Pin assignment</a></li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#instruction_set">2.2. Instruction set</a></li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#visible_ddram">2.3. Visible DDRAM addresses</a></li>
+        <li>
+        <ul>
+            <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#_1_line_displays">2.3.1. 1-line displays</a></li>
+            <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#_2_line_displays">2.3.2. 2-line displays</a></li>
+            <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#_4_line_displays">2.3.3. 4-line displays</a></li>
+        </ul>
+        </li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#transfer">2.4. Interfacing</a></li>
+        <li>
+        <ul>
+            <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#_8bit-transfer">2.4.1. 8-bit interface</a></li>
+            <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#_4bit-transfer">2.4.2. 4-bit interface</a></li>
+        </ul>
+        </li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#charset">2.5. Character set</a></li>
+        <li><a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml#related">2.6. Related pages</a></li>
+    </ul>
+    </li>
+</ul>
+
+</div>
+
+
+<div class="paragraph_1">
+<a id="general"></a>
+1. General
+</div>
+<div class="paragraph_content">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="disclaimer"></a>
+1.1. Disclaimer
+</div>
+<div class="paragraph_content">
+THIS DOCUMENT IS PROVIDED TO THE USER ''AS IS''. Etc.etc.<br>
+<br>
+All information in this document is to the best of my knowledge.<br>
+The 8051 PL/M51 software is used in applications using 2*16, 2*20, 4*20 and 2*40 LC-Displays.<br>
+The PIC ASM software is used in applications using 2*20, 4*20 and 2*40 LC-Displays.<br>
+So there should be no risk, but there's still Murphy.<br>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="usage"></a>
+1.2. Usage
+</div>
+<div class="paragraph_content">
+<a href="mailto:info-hd.44780@iae.nl?subject=%28none%29">Tell me about your applications.</a><br>
+<a href="http://postcards.www.media.mit.edu/Postcards/Welcome.html">Send a postcard</a><br>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="purpose"></a>
+1.3. Purpose
+</div>
+<div class="paragraph_content">
+Uuuhm..<br>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_1">
+<a id="hd44780"></a>
+2. HD44780-based LCD modules
+</div>
+<div class="paragraph_content">
+Data from <cite>HITACHI LIQUID CRYSTAL CHARACTER DISPLAY MODULE</cite> and <cite>OPTREX DOT MATRIX LCD MODULE</cite> databooks.<br>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="pin_assignment"></a>
+2.1. Pin assignment
+</div>
+<div class="paragraph_content">
+The pin assignment shown in <i>Table 2.1.</i> is the industry standard for character
+LCD-modules with a <i>maximum of</i> 80 characters.<br>
+The pin assignment shown in <i>Table 2.2.</i> is the industry standard for character
+LCD-modules with <i>more than</i> 80 characters.<br>
+<br>
+To be sure <b>always</b> check the manufacturers datasheet!<br>
+To locate pin 1 on a module check the manufacturers datasheet!<br>
+<br>
+<table>
+    <caption>
+        <i>Table 2.1., Pin assignment for &lt;= 80 character displays</i>
+    </caption>
+    <thead>
+        <tr>
+            <th>Pin number</th>
+            <th>Symbol</th>
+            <th>&nbsp;Level&nbsp;&nbsp;</th>
+            <th>I/O</th>
+            <th>Function</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="middle">1</td>
+            <td class="middle">Vss</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Power supply (GND)</td>
+        </tr>
+        <tr>
+            <td class="middle">2</td>
+            <td class="middle">Vcc</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Power supply (+5V)</td>
+        </tr>
+        <tr>
+            <td class="middle">3</td>
+            <td class="middle">Vee</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Contrast adjust</td>
+        </tr>
+        <tr>
+            <td class="middle">4</td>
+            <td class="middle">RS</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I</td>
+            <td>0 = Instruction input<br>1 = Data input</td>
+        </tr>
+        <tr>
+            <td class="middle">5</td>
+            <td class="middle">R/W</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I</td>
+            <td>0 = Write to LCD module<br>1 = Read from LCD module</td>
+        </tr>
+        <tr>
+            <td class="middle">6</td>
+            <td class="middle">E</td>
+            <td class="middle">1, 1-&gt;0</td>
+            <td class="middle">I</td>
+            <td>Enable signal</td>
+        </tr>
+        <tr>
+            <td class="middle">7</td>
+            <td class="middle">DB0</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 0 (LSB)</td>
+        </tr>
+        <tr>
+            <td class="middle">8</td>
+            <td class="middle">DB1</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 1</td>
+        </tr>
+        <tr>
+            <td class="middle">9</td>
+            <td class="middle">DB2</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 2</td>
+        </tr>
+        <tr>
+            <td class="middle">10</td>
+            <td class="middle">DB3</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 3</td>
+        </tr>
+        <tr>
+            <td class="middle">11</td>
+            <td class="middle">DB4</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 4</td>
+        </tr>
+        <tr>
+            <td class="middle">12</td>
+            <td class="middle">DB5</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 5</td>
+        </tr>
+        <tr>
+            <td class="middle">13</td>
+            <td class="middle">DB6</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 6</td>
+        </tr>
+        <tr>
+            <td class="middle">14</td>
+            <td class="middle">DB7</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 7 (MSB)</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<table>
+    <caption>
+        <i>Table 2.2., Pin assignment for &gt; 80 character displays</i>
+    </caption>
+    <thead>
+        <tr>
+            <th>Pin number</th>
+            <th>Symbol</th>
+            <th>&nbsp;Level&nbsp;&nbsp;</th>
+            <th>I/O</th>
+            <th>Function</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="middle">1</td>
+            <td class="middle">DB7</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 7 (MSB)</td>
+        </tr>
+        <tr>
+            <td class="middle">2</td>
+            <td class="middle">DB6</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 6</td>
+        </tr>
+        <tr>
+            <td class="middle">3</td>
+            <td class="middle">DB5</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 5</td>
+        </tr>
+        <tr>
+            <td class="middle">4</td>
+            <td class="middle">DB4</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 4</td>
+        </tr>
+        <tr>
+            <td class="middle">5</td>
+            <td class="middle">DB3</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 3</td>
+        </tr>
+        <tr>
+            <td class="middle">6</td>
+            <td class="middle">DB2</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 2</td>
+        </tr>
+        <tr>
+            <td class="middle">7</td>
+            <td class="middle">DB1</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 1</td>
+        </tr>
+        <tr>
+            <td class="middle">8</td>
+            <td class="middle">DB0</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I/O</td>
+            <td>Data bus line 0 (LSB)</td>
+        </tr>
+        <tr>
+            <td class="middle">9</td>
+            <td class="middle">E1</td>
+            <td class="middle">1, 1-&gt;0</td>
+            <td class="middle">I</td>
+            <td>Enable signal for row 0 and 1 (1<sup>st</sup>controller)</td>
+        </tr>
+        <tr>
+            <td class="middle">10</td>
+            <td class="middle">R/W</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I</td>
+            <td>0 = Write to LCD module<br>1 = Read from LCD module</td>
+        </tr>
+        <tr>
+            <td class="middle">11</td>
+            <td class="middle">RS</td>
+            <td class="middle">0/1</td>
+            <td class="middle">I</td>
+            <td>0 = Instruction input<br>1 = Data input</td>
+        </tr>
+        <tr>
+            <td class="middle">12</td>
+            <td class="middle">Vee</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Contrast adjust</td>
+        </tr>
+        <tr>
+            <td class="middle">13</td>
+            <td class="middle">Vss</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Power supply (GND)</td>
+        </tr>
+        <tr>
+            <td class="middle">14</td>
+            <td class="middle">Vcc</td>
+            <td class="middle">-</td>
+            <td class="middle">-</td>
+            <td>Power supply (+5V)</td>
+        </tr>
+        <tr>
+            <td class="middle">15</td>
+            <td class="middle">E2</td>
+            <td class="middle">1, 1-&gt;0</td>
+            <td class="middle">I</td>
+            <td>Enable signal for row 2 and 3 (2<sup>nd</sup>controller)</td>
+        </tr>
+        <tr>
+            <td class="middle">16</td>
+            <td class="middle">n.c.</td>
+            <td class="middle">&nbsp;</td>
+            <td class="middle">&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="instruction_set"></a>
+2.2. Instruction set
+</div>
+<div class="paragraph_content">
+<table>
+    <caption>
+        <i>Table 2.3. HD44780 instruction set</i>
+    </caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Instruction</th>
+            <th rowspan="1" colspan="10">Code</th>
+            <th rowspan="2">Description</th>
+            <th rowspan="2">Execution time**</th>
+        </tr>
+        <tr>
+            <th>RS</th>
+            <th>R/W</th>
+            <th>DB7</th>
+            <th>DB6</th>
+            <th>DB5</th>
+            <th>DB4</th>
+            <th>DB3</th>
+            <th>DB2</th>
+            <th>DB1</th>
+            <th>DB0</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Clear display</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td>Clears display and returns cursor to the home position (address 0).</td>
+            <td class="middle">1.64mS</td>
+        </tr>
+        <tr>
+            <td>Cursor home</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">*</td>
+            <td>Returns
+cursor to home position (address 0). Also returns display being shifted
+to the original position. DDRAM contents remains unchanged.</td>
+            <td class="middle">1.64mS</td>
+        </tr>
+        <tr>
+            <td>Entry mode set</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">I/D</td>
+            <td class="middle">S</td>
+            <td>Sets cursor move direction (I/D), specifies to shift the display (S). These operations are performed during data read/write.</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Display On/Off control</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">D</td>
+            <td class="middle">C</td>
+            <td class="middle">B</td>
+            <td>Sets On/Off of all display (D), cursor On/Off (C) and blink of cursor position character (B).</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Cursor/display shift</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">S/C</td>
+            <td class="middle">R/L</td>
+            <td class="middle">*</td>
+            <td class="middle">*</td>
+            <td>Sets cursor-move or display-shift (S/C), shift direction (R/L). DDRAM contents remains unchanged.</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Function set</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">DL</td>
+            <td class="middle">N</td>
+            <td class="middle">F</td>
+            <td class="middle">*</td>
+            <td class="middle">*</td>
+            <td>Sets interface data length (DL), number of display line (N) and character font(F).</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Set CGRAM address</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle" colspan="6">CGRAM address</td>
+            <td>Sets the CGRAM address. CGRAM data is sent and received after this setting.</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Set DDRAM address</td>
+            <td class="middle">0</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle" colspan="7">DDRAM address</td>
+            <td>Sets the DDRAM address. DDRAM data is sent and received after this setting.</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Read busy-flag and address counter</td>
+            <td class="middle">0</td>
+            <td class="middle">1</td>
+            <td class="middle">BF</td>
+            <td class="middle" colspan="7">CGRAM / DDRAM address</td>
+            <td>Reads
+Busy-flag (BF) indicating internal operation is being performed and
+reads CGRAM or DDRAM address counter contents (depending on previous
+instruction).</td>
+            <td class="middle">0uS</td>
+        </tr>
+        <tr>
+            <td>Write to CGRAM or DDRAM</td>
+            <td class="middle">1</td>
+            <td class="middle">0</td>
+            <td class="middle" colspan="8">write data</td>
+            <td>Writes data to CGRAM or DDRAM.</td>
+            <td class="middle">40uS</td>
+        </tr>
+        <tr>
+            <td>Read from CGRAM or DDRAM</td>
+            <td class="middle">1</td>
+            <td class="middle">1</td>
+            <td class="middle" colspan="8">read data</td>
+            <td>Reads data from CGRAM or DDRAM.</td>
+            <td class="middle">40uS</td>
+        </tr>
+    </tbody>
+</table>
+<b>Remarks:</b><br>
+- DDRAM = Display Data RAM.<br>
+- CGRAM = Character Generator RAM.<br>
+- DDRAM address corresponds to cursor position.<br>
+- * = Don't care.<br>
+- ** = Based on F<sub>osc</sub> = 250kHz.<br>
+<br>
+<table>
+    <caption>
+        <i>Table 2.4. Bit names</i>
+    </caption>
+    <thead>
+    <tr>
+        <th>Bit name</th>
+        <th colspan="2">Setting / Status</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="middle">I/D</td>
+            <td>0 = Decrement cursor position</td>
+            <td>1 = Increment cursor position</td>
+        </tr>
+        <tr>
+            <td class="middle">S</td>
+            <td>0 = No display shift</td>
+            <td>1 = Display shift</td>
+        </tr>
+        <tr>
+            <td class="middle">D</td>
+            <td>0 = Display off</td>
+            <td>1 = Display on</td>
+        </tr>
+        <tr>
+            <td class="middle">C</td>
+            <td>0 = Cursor off</td>
+            <td>1 = Cursor on</td>
+        </tr>
+        <tr>
+            <td class="middle">B</td>
+            <td>0 = Cursor blink off</td>
+            <td>1 = Cursor blink on</td>
+        </tr>
+        <tr>
+            <td class="middle">S/C</td>
+            <td>0 = Move cursor</td>
+            <td>1 = Shift display</td>
+        </tr>
+        <tr>
+            <td class="middle">R/L</td>
+            <td>0 = Shift left</td>
+            <td>1 = Shift right</td>
+        </tr>
+        <tr>
+            <td class="middle">DL</td>
+            <td>0 = 4-bit interface</td>
+            <td>1 = 8-bit interface</td>
+        </tr>
+        <tr>
+            <td class="middle">N</td>
+            <td>0 = 1/8 or 1/11 Duty (1 line)</td>
+            <td>1 = 1/16 Duty (2 lines)</td>
+        </tr>
+        <tr>
+            <td class="middle">F</td>
+            <td>0 = 5x7 dots</td>
+            <td>1 = 5x10 dots</td>
+        </tr>
+        <tr>
+            <td class="middle">BF</td>
+            <td>0 = Can accept instruction</td>
+            <td>1 = Internal operation in progress</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="visible_ddram"></a>
+2.3. Visible DDRAM addresses
+</div>
+<div class="paragraph_content">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_3">
+<a id="_1_line_displays"></a>
+2.3.1. 1-line displays
+</div>
+<div class="paragraph_content">
+Shown after reset (with N=0).<br>
+<img src="lcd0.shtml_files/lcd-1l.gif" alt="1-line LCD" height="40" width="970">
+<br>
+<table>
+    <caption>
+        <i>Table 2.5. DDRAM address usage for a 1-line LCD</i>
+    </caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Display size</th>
+            <th colspan="2">Visible</th>
+        </tr>
+        <tr>
+            <th>Character positions</th>
+            <th>DDRAM addresses</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="middle">1*8</td>
+            <td class="middle">00..07</td>
+            <td class="middle">0x00..0x07</td>
+        </tr>
+        <tr>
+            <td class="middle">1*16</td>
+            <td class="middle">00..15</td>
+            <td class="middle">0x00..0x0F <span class="usercomment">[1] [2] [3] [4]</span></td>
+        </tr>
+        <tr>
+            <td class="middle">1*20</td>
+            <td class="middle">00..19</td>
+            <td class="middle">0x00..0x13</td>
+        </tr>
+        <tr>
+            <td class="middle">1*24</td>
+            <td class="middle">00..23</td>
+            <td class="middle">0x00..0x17</td>
+        </tr>
+        <tr>
+            <td class="middle">1*32</td>
+            <td class="middle">00..31</td>
+            <td class="middle">0x00..0x1F</td>
+        </tr>
+        <tr>
+            <td class="middle">1*40</td>
+            <td class="middle">00..39</td>
+            <td class="middle">0x00..0x27</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<div class="usercomment">
+[1] Peter Bozzay:<br>
+Found DDRAM addresses 0x00..0x07 + 0x40..0x47 to be functional for a 1*16 display size.<br>
+Make/model: not mentioned / SC1601AS*B.<br>
+[2] Hendrik Abma:<br>
+Found DDRAM addresses 0x00..0x07 + 0x40..0x47 to be functional for a 1*16 display size.<br>
+Make/model: Samtron / KP-03.<br>
+<!-- Make/model: <a href="http://www.samtron.com/">Samtron</a> / KP-03.<br /> -->
+[3] Luigi Candurro:<br>
+Found DDRAM addresses 0x00..0x07 + 0x40..0x47 to be functional for a 1*16 display size.<br>
+Make/model: <a href="http://www.cct.com.my/">Crystal Clear Technology</a> / CMC116-01.<br>
+<!-- No further information available in CMC116-01.zip -->
+[4] Thierry Giorgetti:<br>
+Found DDRAM addresses 0x00..0x07 + 0x40..0x47 to be functional for a 1*16 display size.<br>
+Make/model: <a href="http://www.lcdchina.com/eindex.asp">Xiamen Ocular</a> / GDM1601c (Local copy available as <a href="http://home.iae.nl/users/pouweha/lcd/zips/GDM1601C.zip">zipped file</a>, approx 278kB).<br>
+</div>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_3">
+<a id="_2_line_displays"></a>
+2.3.2. 2-line displays
+</div>
+<div class="paragraph_content">
+Shown after reset (with N=1).<br>
+<img src="lcd0.shtml_files/lcd-2l.gif" alt="2-line LCD" height="50" width="971">
+<br>
+<table>
+    <caption>
+        <i>Table 2.6. DDRAM address usage for a 2-line LCD</i>
+    </caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Display size</th>
+            <th colspan="2">Visible</th>
+        </tr>
+        <tr>
+            <th>Character positions</th>
+            <th>DDRAM addresses</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="middle">2*16</td>
+            <td class="middle">00..15</td>
+            <td class="middle">0x00..0x0F + 0x40..0x4F <span class="usercomment">[1]</span></td>
+        </tr>
+        <tr>
+            <td class="middle">2*20</td>
+            <td class="middle">00..19</td>
+            <td class="middle">0x00..0x13 + 0x40..0x53</td>
+        </tr>
+        <tr>
+            <td class="middle">2*24</td>
+            <td class="middle">00..23</td>
+            <td class="middle">0x00..0x17 + 0x40..0x57</td>
+        </tr>
+        <tr>
+            <td class="middle">2*32</td>
+            <td class="middle">00..31</td>
+            <td class="middle">0x00..0x1F + 0x40..0x5F</td>
+        </tr>
+        <tr>
+            <td class="middle">2*40</td>
+            <td class="middle">00..39</td>
+            <td class="middle">0x00..0x27 + 0x40..0x67</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<div class="usercomment">
+[1] Author:<br>
+According to their datasheets DDRAM addresses 0x80..0x8F + 0xC0..0xCF are used.<br>
+Make/model: <a href="http://www.edtc.com/">Emerging Display Technologies</a> / EW162G0YMY &nbsp;&nbsp;(Local copy available as <a href="http://home.iae.nl/users/pouweha/lcd/zips/162G0LED.zip">zipped file</a>, approx 85kB).<br>
+Make/model: <a href="http://www.mitsutech.com.tw/edt_character.htm">Mitsutech</a> / EW162G0YMY &nbsp;&nbsp;(Local copy available as <a href="http://home.iae.nl/users/pouweha/lcd/zips/ew162g0led.zip">zipped file</a>, approx 86kB).<br>
+</div>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_3">
+<a id="_4_line_displays"></a>
+2.3.3. 4-line displays
+</div>
+<div class="paragraph_content">
+Shown after reset (with N=1).<br>
+<img src="lcd0.shtml_files/lcd-4l.gif" alt="4-line LCD" height="80" width="570">
+<br>
+<table>
+    <caption>
+        <i>Table 2.7. DDRAM address usage for a 4-line LCD</i>
+    </caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Display size</th>
+            <th colspan="2">Visible</th>
+        </tr>
+        <tr>
+            <th>Character positions</th>
+            <th>DDRAM addresses</th>
+        </tr>
+    </thead>
+    <tbody class="middle">
+        <tr>
+            <td class="middle">4*16</td>
+            <td class="middle">00..15</td>
+            <td class="middle">0x00..0x0F + 0x40..0x4F + 0x14..0x23 + 0x54..0x63 <span class="usercomment">[1] [2]</span></td>
+        </tr>
+        <tr>
+            <td class="middle">4*20</td>
+            <td class="middle">00..19</td>
+            <td class="middle">0x00..0x13 + 0x40..0x53 + 0x14..0x27 + 0x54..0x67</td>
+        </tr>
+        <tr>
+            <td class="middle">4*40</td>
+            <td class="middle">(00..39) on 1<sup>st</sup> controller and<br>(00..39) on 2<sup>nd</sup> controller</td>
+            <td class="middle">(0x00..0x27 + 0x40..0x67) on 1<sup>st</sup> controller and<br>(0x00..0x27 + 0x40..0x67) on 2<sup>nd</sup> controller</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<div class="usercomment">
+[1] Rick Mann:<br>
+Found DDRAM addresses 0x00..0x0F + 0x40..0x4F + 0x10..0x1F + 0x50..0x5F to be functional for a 4*16 display size.<br>
+Make/model: <a href="http://www.optrex.com/">Optrex</a> / DMC16433.<br>
+Author:<br>
+This matches with the information mentioned in <a href="http://www.optrex.com/pdfs/Dmcman_full.pdf">Dmcman_full.pdf</a> paragraph 1.7.6.4. Local copy available as <a href="http://home.iae.nl/users/pouweha/lcd/zips/Dmcman_full.pdf.zip">zipped file</a>, approx 176kB.<br>
+[2] Tushar Rane:<br>
+Found DDRAM addresses 0x00..0x0F + 0x40..0x4F + 0x10..0x1F + 0x50..0x5F to be functional for a 4*16 display size.<br>
+Make/model: not mentioned / not mentioned.<br>
+</div>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="transfer"></a>
+2.4. Interfacing
+</div>
+<div class="paragraph_content">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_3">
+<a id="_8bit-transfer"></a>
+2.4.1. 8-bit interface
+</div>
+<div class="paragraph_content">
+Example of busy flag testing using an 8-bit interface.<br>
+<img src="lcd0.shtml_files/8bit-interface.gif" alt="8-bit interface">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_3">
+<a id="_4bit-transfer"></a>
+2.4.2. 4-bit interface
+</div>
+<div class="paragraph_content">
+Example of busy flag testing using a 4-bit interface.<br>
+<img src="lcd0.shtml_files/4bit-interface.gif" alt="4-bit interface"><br>
+<br>
+<br>
+<br>
+Example of data transfer using a 4-bit interface.<br>
+<img src="lcd0.shtml_files/4bit-transfer.gif" alt="4-bit interface">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="charset"></a>
+2.5. Character set
+</div>
+<div class="paragraph_content">
+Characterset for 5x7 dot font<br>
+<img src="lcd0.shtml_files/lcd-ch1a.gif" alt="LCD character set" height="500" width="400">
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<div class="paragraph_2">
+<a id="related"></a>
+2.6. Related pages
+</div>
+<div class="paragraph_content">
+Private sites:<br>
+- <a href="http://www.repairfaq.org/filipg/LINK/F_Tech_LCD.html">Fil's FAQ-Link-In Corner: LCD Technology FAQ</a><br>
+- <a href="http://www.repairfaq.org/filipg/LINK/F_LCD_HD44780.html">Fil's FAQ-Link-In Corner: HD44780-based LCD</a><br>
+- <a href="http://www.doc.ic.ac.uk/%7Eih/doc/lcd/pc_example/">LCD Module to PC Interfacing Example</a><br>
+- <a href="http://www.doc.ic.ac.uk/%7Eih/doc/lcd/">HD44780-based LCD Modules</a><br>
+<br>
+Commercial sites:<br>
+- <a href="http://www.eio.com/lcdintro.htm">LCD Intro</a><br>
+- <a href="http://www.hantronix.com/">HANTRONIX, Inc. Home Page</a><br>
+- <a href="http://www.shellyinc.com/eanmenu.htm">Shelly, Inc. - LCD Engineering Application Notes</a><br>
+</div>
+<div class="toc_link">
+<a href="#TOC">TOC</a>
+</div>
+
+
+<!--
+	timing ?
+	display-address layout
+	CG address layout (example?)
+--> <!--   empty paragraph entry
+<hr height=5>
+<div class="paragraph_3">
+<a id="....">
+3.3.x. ....
+</div>
+<pre>
+<b><i>Purpose:</i></b>
+....
+<b><i>Code:</i></b>
+....
+</pre>
+-->
+
+
+<div class="navigators">
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd.shtml">TOC</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd0.shtml">General info</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd1.shtml">8051 example</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd2.shtml">PIC example</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd_examp.shtml">Misc. examples</a> |
+<a href="http://home.iae.nl/users/pouweha/lcd/lcd_md.shtml">Manuf./Distrib.</a> |
+<a href="http://home.iae.nl/users/pouweha/index.shtml">Home</a> |
+<a href="http://ouwehand.net/%7Epeter/lcd/guestbook/gb_func.php?action=add">Sign Guestbook</a> |
+<a href="http://ouwehand.net/%7Epeter/lcd/guestbook/gb_func.php?action=view">View Guestbook</a>
+</div>
+
+
+<div class="valid">
+
+
+<a href="http://validator.w3.org/check?uri=referer"><img src="lcd0.shtml_files/valid-xhtml11.png" alt="Valid XHTML 1.1!" style="border: 0pt none ; width: 88px; height: 31px;"></a>
+
+
+
+<a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="lcd0.shtml_files/vcss.gif" alt="Valid CSS!" style="border: 0pt none ; width: 88px; height: 31px;"></a>
+<div style="width: 200px; float: left;">
+</div>
+
+<a href="http://www.spreadfirefox.com/"><img src="lcd0.shtml_files/GetFireFox-110x32.gif" style="border: 0pt none ;" alt="Get Firefox"></a>
+<a href="http://petition.eurolinux.org/"><img src="lcd0.shtml_files/patent_button.jpg" style="border: 0pt none ;" alt="Euro No Patents"></a>
+<div style="width: 250px; float: right;">
+</div>
+
+</div>
+
+
+
+</body></html>

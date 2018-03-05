@@ -8,6 +8,9 @@
 bin/
 tmp/
 __vm/
+v14/
+*.xml
+*.cppproj
 *.filters
 *.vcxproj
 *.tmp

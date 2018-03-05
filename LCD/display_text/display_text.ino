@@ -12,6 +12,11 @@ byte d7 = 7; //d7
 
 byte pinArray[] = { resistorSelect, d7, d6, d5, d4 };
 
+const long initialTextPosition = -30;
+long textPosition = initialTextPosition;
+
+const char signMessage2[] PROGMEM = { "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sit amet shes bez deset felis id krokos." };
+
 void setup()
 {
 	pinMode(resistorSelect, OUTPUT); // resistorSelect
@@ -42,17 +47,112 @@ void setup()
 	WriteBits();
 	delay(1);
 
-	incomingByte = B00001110; // command bit 3,  Display ON (bit 2), Cursor On (bit 1), Cursor Blinking (bit 0);
+	incomingByte = B00001100; // command (bit 3),  Display ON/OFF (bit 2), Cursor ON/OFF (bit 1), Cursor Blinking (bit 0);
 	WriteBits();
 	delay(1);
 
-	incomingByte = B00000110;  //Entry Mode, Increment cursor position, No display shift
+	incomingByte = B00000110;  //Sets cursor move direction (bit 1), specifies to shift the display (bit 0). These operations are performed during data read/write
 	WriteBits();
 	delay(1);
 	ClearScreen();
 	delay(40);
 }
 
+void loop()
+{
+	PrintAStringToLCD();
+}
+
+void PrintAStringToLCD() 
+{
+	byte displayChars[32];
+
+	for (byte i = 0; i < sizeof(displayChars); i++)
+	{
+		if (textPosition < sizeof(signMessage2) - 1 && textPosition >= 0)
+		{
+			char myChar = pgm_read_byte_near(signMessage2 + textPosition);
+			displayChars[i] = myChar;
+		}
+		else
+		{
+			displayChars[i] = ' ';
+		}
+
+		textPosition++;
+	}
+
+
+	textPosition -= sizeof(displayChars);
+	textPosition++;
+
+	if (textPosition > sizeof(signMessage2))
+	{
+		textPosition = initialTextPosition;
+	}
+
+	delay(700);
+
+	for (int i = 0; i < sizeof(displayChars); i++)
+	{
+		DisplayAChar(displayChars[i]);
+		ManageCursor(-1000);
+	}
+}
+
+// Clears screen if reached the end of second line, otherwise moves the cursor to the lower row
+// accepts how many miliseconds to wait before clearing the screen, if set to negative value, does not clear the screen
+void ManageCursor(int waitMilis)
+{
+	if ((cursorPosition > 15) && (cursorPosition < 33) && (cursorFlag == 0))  //end of the line, set cursor to next line
+	{
+		digitalWrite(resistorSelect, LOW);
+		incomingByte = B11000000;
+		cursorPosition++;
+		cursorFlag = 1;
+		WriteBits();
+	}
+
+	if ((cursorPosition >= 33) && (cursorFlag == 1))    // end of second line, set cursor to beginning
+	{
+		digitalWrite(resistorSelect, LOW);
+		incomingByte = B10000000;
+		WriteBits();
+		cursorPosition = 0;
+		cursorFlag = 0;
+
+		delay(0);
+
+		if (waitMilis > 0)
+		{
+			ClearScreen();
+		}
+	}
+}
+
+void ShiftDisplayLeft()
+{
+	incomingByte = B00011000;
+	digitalWrite(resistorSelect, LOW);
+	WriteBits();
+}
+
+void ShiftDisplayRight()
+{
+	incomingByte = B00011100;
+	digitalWrite(resistorSelect, LOW);
+	WriteBits();
+}
+
+void DisplayAChar(char character)     //displays a character on the LCD
+{
+	digitalWrite(resistorSelect, HIGH);
+	delayMicroseconds(4);
+	incomingByte = character;
+	WriteBits();
+	cursorPosition++;
+	delayMicroseconds(4);
+}
 
 void ClearScreen()
 {
@@ -90,7 +190,6 @@ void PulseEnablePin()
 	delayMicroseconds(4);
 }
 
-
 void WriteHighBits()
 {
 	byte array_loop = 0;
@@ -101,76 +200,4 @@ void WriteHighBits()
 	}
 
 	PulseEnablePin();
-}
-
-void loop()
-{
-
-	delay(500);
-
-	char displayText[33] = "12345678abcdefgh87654321hgfedcba";
-
-
-	for (int i = 0; i < sizeof(displayText) - 1; i++)
-	{
-		DisplayAChar(displayText[i]);
-
-		delay(200);
-		ManageCursor(-1000);
-	}
-}
-
-// Clears screen if reached the end of second line, otherwise moves the cursor to the lower row
-// accepts how many miliseconds to wait before clearing the screen, if set to negative value, does not clear the screen
-void ManageCursor(int waitMilis)
-{
-	if ((cursorPosition > 15) && (cursorPosition <33) && (cursorFlag == 0))  //end of the line, set cursor to next line
-	{
-		digitalWrite(resistorSelect, LOW);
-		incomingByte = B11000000;
-		cursorPosition++;
-		cursorFlag = 1;
-		WriteBits();
-	}
-
-	if ((cursorPosition >= 33) && (cursorFlag == 1))    // end of second line, set cursor to beginning
-	{
-		digitalWrite(resistorSelect, LOW);
-		incomingByte = B10000000;
-		WriteBits();
-		cursorPosition = 0;
-		cursorFlag = 0;
-
-
-		delay(waitMilis);
-
-		if (waitMilis > 0)
-		{
-			ClearScreen();
-		}
-	}
-}
-
-void ShiftDisplayLeft()
-{
-	incomingByte = B00011000;
-	digitalWrite(resistorSelect, LOW);
-	WriteBits();
-}
-
-void ShiftDisplayRight()
-{
-	incomingByte = B00011100;
-	digitalWrite(resistorSelect, LOW);
-	WriteBits();
-}
-
-void DisplayAChar(char character)     //displays a character on the LCD
-{
-	digitalWrite(resistorSelect, HIGH);
-	delay(1);
-	incomingByte = character;
-	WriteBits();
-	cursorPosition++;
-	delay(1);
 }

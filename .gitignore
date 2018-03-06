@@ -2,6 +2,7 @@
 ## Eclipse
 #################
 
+*.sln
 *.pydevproject
 .project
 .metadata

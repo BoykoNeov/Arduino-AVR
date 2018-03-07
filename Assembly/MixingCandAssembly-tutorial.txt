@@ -1,0 +1,148 @@
+1.    Open Arduino IDE. I tested the code with the hourly build, v1.6.9, and 1.6.5-r5 but I'd guess any recent version will work.
+2.    File > New
+3.    Paste the code titled blink.ino into the IDE editor window
+4.    Click the upside down triangle button at the top right of the editor window.
+5.    New Tab > Name for new file: > blink.S - actually you can give it any name you like as long as it has the .S extension. It has to be an upper case S.
+6.    Paste the code titled blink.S into the IDE editor window in the blink.S tab.
+7.    Upload the sketch to your board as usual and you should see the LED connected to pin 13 start blinking.
+
+blink.ino :
+START OF FILE (do not include this)
+
+extern "C" {
+  // function prototypes
+  void start();
+  void blink();
+}
+
+void setup() {
+  start();
+}
+
+void loop() {
+  blink();
+}
+
+END OF FILE (do not include this)
+
+
+blink.s :
+START OF FILE (do not include this)
+
+
+; Blink LED on PB5(Arduino Uno pin 13)
+; http://forum.arduino.cc/index.php?topic=159572#msg1194604
+
+#define _SFR_ASM_COMPAT 1
+#define __SFR_OFFSET 0
+#define F_CLK 16000000
+ 
+#include "avr/io.h"
+
+.global start
+.global blink
+
+start:
+  sbi   DDRB,5  ; Set PB5 as output
+  ret
+
+blink:
+  ldi   r20,250 ; Set the delay duration in ms. Maximum value is 255.
+  call  delay_n_ms
+  sbi   PORTB,5 ; Set PB5 HIGH
+  ldi   r20,250
+  call  delay_n_ms
+  cbi   PORTB,5 ; Set PB5 LOW
+  ret
+
+delay_n_ms:
+  ; Delay about r20*1ms. Destroys r20, r30, and r31.
+  ; One millisecond is about 16000 cycles at 16MHz.
+  ; The basic loop takes about 5 cycles, so we need about 3000 loops.
+  ldi   31, 3000>>8 ; high(3000)
+  ldi   30, 3000&255  ; low(3000)
+delaylp:
+  sbiw    r30, 1
+  brne    delaylp
+  subi    r20, 1
+  brne    delay_n_ms
+  ret
+
+
+END OF FILE (do not include this)
+
+
+Mixing C and Assembly Languages
+
+We may wish to have a C function call an assembly function.
+We may wish to have an assembly function call a C function.
+AVR studio's assembler is not able to integrate the two languages.
+Each project creates a single .hex file from a single .asm file.
+Additional .asm files have to be .included in the main .asm file.
+The GCC compiler allows both C and assembly to be used together.
+
+.s files (instead of .asm file) for assembly language code.
+.c files for C language code.
+.cpp files for C++ language code.
+
+The choice of assembler is made when an AVR studio project is created.
+Be aware that there are some syntax differences between the AVR studio's assembler and the GCC tools.
+
+Syntax Differences with GCC
+
+#include <avr/io.h> instead of .include "m32def.inc"
+.segment .data instead of .dseg
+.segment .text instead of .cseg
+.asciz "message" instead of .db "message", 0 (Notice that the character array is automatically null terminated.)
+lo8() instead of HIGH()
+hi8() instead of LOW()
+File suffix of .s instead of .asm
+No need for .org directives in code segement since the compiler handles this automatically.
+.org directives in data segements are offset from the last location needed by the compiler.
+
+If the compiler doesn't reserve any data memory, then .org 0x0 would actually map to 0x60.
+The compiler uses data memory to store global variables and character string literals.
+Lines containing preprocessor directives that begin with a # (e.g., #include ..., #define ...) must use C/C++ style comments (cannot use semicolon).
+
+Common Code in .s Files
+
+Every .s file should contain the following GCC directives:
+#include <avr/io.h> — Definitions for PORTB, SREG, etc
+#define _SFR_ASM_COMPAT 1  /* Not sure when/if this is needed */
+#define __SFR_OFFSET 0
+Without the second line, labels like PORTB resolve to their data space address value (0x36) instead of their I/O space address value (0x16).
+Essentially this subtracts 0x20 from the data space address so that it matches up with how we used the I/O ports in AVR studio's assembler.
+
+C Compiler's Register Usage
+
+The C compiler views registers in one of three ways:
+Temporary — registers whose value need not be preserved (R0, R18:27, R30:31)
+If calling assembly from C, there is no need for us to preserve the register(s) in the assembly function.
+If calling C from assembly, we should push the register(s) before calling the C function and pop the register(s) immediately following the return (since the C compiler doesn't attempt to preserve the register's value).
+Saved — registers whose value must be preserved (R2:17, R28:29).
+If calling assembly from C, we must push the register(s) onto the stack at the beginning of the assembly function and pop the register(s) off the stack just prior to returning from the assembly function.
+If calling C from assembly, there is no need for us to preserve the register(s) in the assembly function.
+R1 — Assumed to have a 0 in it.
+If calling assembly from C — the assembly function may use R1 but it must be cleared before returning from the function.
+If calling C from assembly — the assembly function must make sure that R1=0 before calling the C function.
+
+
+Passing Parameters between C and Assembly
+
+Every C compiler has it's own rules/conventions for passing parameters to subroutines.
+Parameters may be passed via Registers and/or the stack.
+uint8_t — An unsigned 8-bit integer.
+Consider the function prototype:
+uint8_t function(uint8_t i, uint8_t j);
+Parameters are passed via R25:8 (R25 to R8).
+A minimum of two registers (16 bits) are used for each parameter passed.
+Parameters are passed left to right.
+In our example,
+i would be stored in R25:24 (with the actual 8-bit value stored in R24).
+j would be stored in R23:22 (with the actual 8-bit value stored in R22).
+If the parameters passed require more memory than is available in the registers R25:8, then the stack is used to pass additional parameters.
+Return values are placed in registers beginning at R25.
+An 8-bit value gets returned in R24.
+An 16-bit value gets returned in R25:24.
+An 32-bit value gets returned in R25:22.
+An 64-bit value gets returned in R25:18.

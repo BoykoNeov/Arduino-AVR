@@ -1,5 +1,9 @@
 // include the library code:
 #include <LiquidCrystal.h>
+
+// EEPROM operation library
+#include <EEPROM.h>
+
 const byte resistorSelect = 8; //rs select
 const byte enable = 9; //enable
 const byte d4 = 4; //d4
@@ -22,6 +26,7 @@ unsigned long oldMillis = 0;
 unsigned long currentMillis = 0;
 bool isLeapYear = false;
 
+// Cursor and editing/selecting variables
 const byte blackChar[8] = 
 {
   B11111,
@@ -32,7 +37,6 @@ const byte blackChar[8] =
   B11111,
   B11111,
 };
-
 int blackCursorColumn = 15;
 int blackCursorRow = 0;
 int lastBlackCursorColumn = 15;
@@ -56,13 +60,23 @@ LiquidCrystal lcd(resistorSelect, enable, d4, d5, d6, d7);
 byte oldPressedButton = 0;
 byte currentPressedButton = 0;
 
+unsigned int EEPROMFreeIndex = 0;
+
 void setup() 
 {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   lcd.createChar(0, blackChar);
   
-  Serial.begin(9600);
+ // Serial.begin(9600);
+  EEPROMFreeIndex = DetermineFirstFreeEEPROMIndex();
+  Serial.println(EEPROMFreeIndex);
+
+//because we dont need the last starting index ot free EEPROM, but the actual data, we substract 6 (Date/Time is 6 bytes long);
+  if (EEPROMFreeIndex > 5)
+  {
+    ReadDateTimeFromEEPROM(EEPROMFreeIndex - 6);
+  }
 }
 
 void loop() 

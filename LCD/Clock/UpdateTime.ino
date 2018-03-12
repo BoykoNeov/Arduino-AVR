@@ -48,6 +48,21 @@ void UpdateTime()
   {
     seconds = 0;
     minutes++;
+
+    //this usually means that a minute has passed naturally in clock operation, but to avoid writing to EEPROM when manually editing, first check that editSwitch is off
+    // Write Date/Time every 2 minutes
+    if (!editSwitch && minutes % 2 == 0)
+    {
+      // if this is true, means EEPROM is fully written
+      // if EEPROM.length() returns 1024 (as it is on 382p), the last byte is 1023, and we need at least 6 bytes for the Date/Time, this is byte 1018, so 1024 - 6 = 
+      if (EEPROMFreeIndex > EEPROM.length() - 6)
+        {
+          EraseEEPROM();
+          EEPROMFreeIndex = 0;
+        }
+
+       WriteDateTimeToEEPROM(EEPROMFreeIndex);
+    }
   }
   else if (seconds < 0)
   {

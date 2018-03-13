@@ -1,7 +1,5 @@
 void EditDateTime(byte pressedButtonNumber)
 {
-  int changingValue;
-
   if (blackCursorRow == 0)
   {
     if (blackCursorColumn <= 4)
@@ -12,7 +10,7 @@ void EditDateTime(byte pressedButtonNumber)
     {
       ChangeValue(month, pressedButtonNumber);
     }
-    else if (blackCursorColumn <= 10)
+    else if (blackCursorColumn <= 14)
     {
       ChangeValue(monthDay, pressedButtonNumber);
     }

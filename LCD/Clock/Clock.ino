@@ -11,15 +11,16 @@ const byte d5 = 5; //d5
 const byte d6 = 6; //d6
 const byte d7 = 7; //d7
 
-int hours = 0;
-int minutes = 0;
+int hours = 12;
+int minutes = 45;
 int seconds = 0;
 
-int month = 0;
-int monthDay = 1;
+int month = 2;
+int monthDay = 13;
 int year = 2018;
 
-char* monthNames[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+String monthNames[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+String daysOfWeek[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 byte monthLengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 unsigned long oldMillis = 0;
@@ -68,9 +69,15 @@ void setup()
   lcd.begin(16, 2);
   lcd.createChar(0, blackChar);
   
- // Serial.begin(9600);
+  Serial.begin(9600);
   EEPROMFreeIndex = DetermineFirstFreeEEPROMIndex();
   Serial.println(EEPROMFreeIndex);
+
+  if (EEPROMFreeIndex >= EEPROM.length())
+  {
+    EraseEEPROM();
+    EEPROMFreeIndex = 0;
+  }
 
 //because we dont need the last starting index ot free EEPROM, but the actual data, we substract 6 (Date/Time is 6 bytes long);
   if (EEPROMFreeIndex > 5)
@@ -83,12 +90,12 @@ void loop()
 {
    if (editSwitch)
    {
-     lcd.setCursor(12,0);
+     lcd.setCursor(12,1);
      lcd.print("EDIT");
    }
    else
    {
-     lcd.setCursor(12,0);
+     lcd.setCursor(12,1);
      lcd.print("    ");
    }
 
@@ -133,6 +140,10 @@ if (selectSwitch)
   lcd.print("/");
   
   PrintNumericValue(monthDay);
+
+  byte dayOfWeek = ReturnDayOfWeek(year, month, monthDay);
+  lcd.print(' ');
+  lcd.print(daysOfWeek[dayOfWeek]);
   
   lcd.setCursor(0, 1);
  
@@ -146,7 +157,7 @@ if (selectSwitch)
   PrintNumericValue(seconds);
 
   UpdateTime();
-  CheckForLeapYear();
+  UpdateLeapYear();
 }
 
 void PrintNumericValue(int value)

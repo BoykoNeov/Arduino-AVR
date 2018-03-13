@@ -123,7 +123,7 @@ void UpdateTime()
    }
 }
 
-void CheckForLeapYear()
+void UpdateLeapYear()
 {
   bool yearCanBeDividedBy4 = year % 4 == 0;
   bool yearCanBeDividedBy100 = year % 100 == 0;
@@ -155,3 +155,66 @@ void CheckForLeapYear()
     monthLengths[1] = 28;
   }
 }
+
+bool IsLeapYear(int year)
+{
+  bool result = false;
+
+  bool yearCanBeDividedBy4 = year % 4 == 0;
+  bool yearCanBeDividedBy100 = year % 100 == 0;
+  bool yearCanBeDividedBy400 = year % 400 == 0;
+  
+  if (yearCanBeDividedBy400)
+  {
+    result = true;
+  }
+  else if (yearCanBeDividedBy100)
+  {
+    result = false;
+  }
+  else if (yearCanBeDividedBy4)
+  {
+    result = true;  
+  }
+  else
+  {
+    result = false;
+  }
+
+  return result;
+}
+
+// determines the day of week for a given date, 0 - sun, 6 - sat;
+byte ReturnDayOfWeek(int givenYear, int givenMonth, int givenDay)
+{
+  byte monthLengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  
+  bool leapYear = IsLeapYear(givenYear);
+  int result = WhatDayIsFirstJan(givenYear);
+
+  for (byte i = 0; i < givenMonth; i++)
+  {
+    result += monthLengths[i];
+  }
+
+//because if we add all the days, we count one day twice
+  result += givenDay - 1;
+
+  if (leapYear && givenMonth > 1)
+  {
+      result++;
+  }
+  
+  result %= 7;
+  return (byte)result;
+}
+
+// determines the day of week for first January of a given date, 0 - sun, 6 - sat;
+byte WhatDayIsFirstJan(int givenYear)
+{
+  unsigned long year = (unsigned long)givenYear;
+  byte day = (byte)((year * 365 + ((year - 1) / 4) - ((year - 1) / 100) + ((year - 1) / 400)) % 7);
+
+  return day;
+}
+

@@ -102,12 +102,13 @@ No need for .org directives in code segement since the compiler handles this aut
 
 If the compiler doesn't reserve any data memory, then .org 0x0 would actually map to 0x60.
 The compiler uses data memory to store global variables and character string literals.
-Lines containing preprocessor directives that begin with a # (e.g., #include ..., #define ...) must use C/C++ style comments (cannot use semicolon).
+Lines containing preprocessor directives that begin with a # (e.g., #include ..., #define ...) must use C/C++ style comments
+(cannot use semicolon).
 
 Common Code in .s Files
 
 Every .s file should contain the following GCC directives:
-#include <avr/io.h> � Definitions for PORTB, SREG, etc
+#include <avr/io.h> — Definitions for PORTB, SREG, etc
 #define _SFR_ASM_COMPAT 1  /* Not sure when/if this is needed */
 #define __SFR_OFFSET 0
 Without the second line, labels like PORTB resolve to their data space address value (0x36) instead of their I/O space address value (0x16).
@@ -116,22 +117,35 @@ Essentially this subtracts 0x20 from the data space address so that it matches u
 C Compiler's Register Usage
 
 The C compiler views registers in one of three ways:
-Temporary � registers whose value need not be preserved (R0, R18:27, R30:31)
+Temporary — registers whose value need not be preserved (R0, R18:27, R30:31)
 If calling assembly from C, there is no need for us to preserve the register(s) in the assembly function.
 If calling C from assembly, we should push the register(s) before calling the C function and pop the register(s) immediately following the return (since the C compiler doesn't attempt to preserve the register's value).
-Saved � registers whose value must be preserved (R2:17, R28:29).
+Saved — registers whose value must be preserved (R2:17, R28:29).
 If calling assembly from C, we must push the register(s) onto the stack at the beginning of the assembly function and pop the register(s) off the stack just prior to returning from the assembly function.
 If calling C from assembly, there is no need for us to preserve the register(s) in the assembly function.
-R1 � Assumed to have a 0 in it.
-If calling assembly from C � the assembly function may use R1 but it must be cleared before returning from the function.
-If calling C from assembly � the assembly function must make sure that R1=0 before calling the C function.
+R1 — Assumed to have a 0 in it.
+If calling assembly from C — the assembly function may use R1 but it must be cleared before returning from the function.
+If calling C from assembly — the assembly function must make sure that R1=0 before calling the C function.
+
+in other words:
+r0 is a temporary register and can be used by compiler generated code. If you write assembly code that uses
+this register and calls a C function, you will need to save and restore this register since the compiler might use
+it
+• r1 is assumed by the compiler to always contain zero. Assembly code that uses this register should clear the
+register before returning to or calling any compiler generated code
+• r2-r17, r28, r29 are “call-saved” registers meaning that calling C functions should leave these registers
+unaltered. An assembly language routine called from C that uses these registers will need to save and restore
+the contents of any of these registers it uses
+• r18-r27, r30, r31 are “call-used” registers meaning that the registers are available for any code to use.
+Assembly code that calls a C function will need to save any of these registers used by the assembly code
+since compiler generated code will not save any of these registers that it uses 
 
 
 Passing Parameters between C and Assembly
 
 Every C compiler has it's own rules/conventions for passing parameters to subroutines.
 Parameters may be passed via Registers and/or the stack.
-uint8_t � An unsigned 8-bit integer.
+uint8_t — An unsigned 8-bit integer.
 Consider the function prototype:
 uint8_t function(uint8_t i, uint8_t j);
 Parameters are passed via R25:8 (R25 to R8).

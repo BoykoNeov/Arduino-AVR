@@ -1,4 +1,4 @@
-1.    Open Arduino IDE. I tested the code with the hourly build, v1.6.9, and 1.6.5-r5 but I'd guess any recent version will work.
+﻿1.    Open Arduino IDE. I tested the code with the hourly build, v1.6.9, and 1.6.5-r5 but I'd guess any recent version will work.
 2.    File > New
 3.    Paste the code titled blink.ino into the IDE editor window
 4.    Click the upside down triangle button at the top right of the editor window.
@@ -81,7 +81,7 @@ Each project creates a single .hex file from a single .asm file.
 Additional .asm files have to be .included in the main .asm file.
 The GCC compiler allows both C and assembly to be used together.
 
-.s files (instead of .asm file) for assembly language code.
+.s files (instead of .asm file) for assembly language code. (When using Arduino IDE, the file should be with a capital "S" - .S - restating this as in the beginning)
 .c files for C language code.
 .cpp files for C++ language code.
 
@@ -113,6 +113,23 @@ Every .s file should contain the following GCC directives:
 #define __SFR_OFFSET 0
 Without the second line, labels like PORTB resolve to their data space address value (0x36) instead of their I/O space address value (0x16).
 Essentially this subtracts 0x20 from the data space address so that it matches up with how we used the I/O ports in AVR studio's assembler.
+
+It is possible for both assembly and C to access the same global variable. Such a variable would need to be a global
+variable in the C code and declared as external in the assembly code. Consider a variable “my_value” intended to be
+global. In the C code it would be declared, outside of any function, like any other variable:
+unsigned char my_value;
+In the assembly it would be coded:
+.extern my_value
+
+Function visibility
+A C language function needs to be declared as external in the assembly code in order to be “seen” by the assembler:
+.extern my_C_function
+An assembly language routine needs to be declared as global in the assembly code in order to be visible to the C
+compiler. This is done using the using the “.global” directive:
+.global my_assembly_fct
+In addition, a C file that intends to call the assembly language routine will need to have a function prototype declaring
+the assembly language routine to be external:
+extern unsigned char my_assembly_fct (unsigned char, unsigned int);
 
 C Compiler's Register Usage
 
@@ -156,7 +173,7 @@ i would be stored in R25:24 (with the actual 8-bit value stored in R24).
 j would be stored in R23:22 (with the actual 8-bit value stored in R22).
 If the parameters passed require more memory than is available in the registers R25:8, then the stack is used to pass additional parameters.
 Return values are placed in registers beginning at R25.
-An 8-bit value gets returned in R24.
+An 8-bit value gets returned in R24. (R25 is all 0s - for positive return value, or all 1s - for negative return value - this is not confirmed)
 An 16-bit value gets returned in R25:24.
 An 32-bit value gets returned in R25:22.
 An 64-bit value gets returned in R25:18.

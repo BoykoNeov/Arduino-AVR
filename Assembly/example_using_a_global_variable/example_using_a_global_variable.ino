@@ -29,7 +29,7 @@ void loop()
   {
     Serial.print("You entered: ");
     Serial.println(userInput);
-    longvar = atol(userInput);
+    longvar = strtol(userInput, NULL, 0);
     DecrementGlobalBy1();
     Serial.print("result: ");
     Serial.println(longvar);

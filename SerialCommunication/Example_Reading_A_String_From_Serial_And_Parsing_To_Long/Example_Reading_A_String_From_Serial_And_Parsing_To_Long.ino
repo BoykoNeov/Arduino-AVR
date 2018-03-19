@@ -23,7 +23,7 @@ void loop()
   {
     Serial.print("You entered: ");
     Serial.println(userInput);
-    long longvar = atol(userInput);
+    longvar = strtol(userInput, NULL, 0);
     longvar /= 2;
     Serial.print("result divided by 2: ");
     Serial.println(longvar);

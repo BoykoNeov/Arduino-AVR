@@ -42,7 +42,6 @@ const char message19[] PROGMEM = {"Charity bestowed upon those who are worthy of
 const char message20[] PROGMEM = {"Let my skin and sinews and bones dry up, together with all the flesh and blood of my body! I welcome it! But I will not move from this spot until I have attained the supreme and final wisdom.   Buddha"};
 const char message21[] PROGMEM = {"With fools, there is no companionship. Rather than to live with men who are selfish, vain, quarrelsome, and obstinate, let a man walk alone.   Buddha"};
 const char message22[] PROGMEM = {"Whatever words we utter should be chosen with care for people will hear them and be influenced by them for good or ill.   Buddha"};
-
 const char message23[] PROGMEM = {"The memory of everything is very soon overwhelmed in time.     Marcus Aurelius"};
 const char message24[] PROGMEM = {"You have power over your mind - not outside events. Realize this, and you will find strength.    Marcus Aurelius"};
 const char message25[] PROGMEM = {"Dwell on the beauty of life. Watch the stars, and see yourself running with them.    Marcus Aurelius"};
@@ -68,6 +67,22 @@ const char message44[] PROGMEM = {"Do not indulge in dreams of having what you h
 const char message45[] PROGMEM = {"What we do now echoes in eternity.    Marcus Aurelius"};
 const char message46[] PROGMEM = {"Think of yourself as dead. You have lived your life. Now, take what's left and live it properly. What doesn't transmit light creates its own darkness.    Marcus Aurelius"};
 const char message47[] PROGMEM = {"Live a good life. If there are gods and they are just, then they will not care how devout you have been, but will welcome you based on the virtues you have lived by. If there are gods, but unjust, then you should not want to worship them. If there are no gods, then you will be gone, but will have lived a noble life that will live on in the memories of your loved ones.    Marcus Aurelius"};
+const char message48[] PROGMEM = {"There are things in life you cannot choose: how you feel. Max Payne"};
+const char message49[] PROGMEM = {"The past is a puzzle, like a broken mirror. As you piece it together, you cut yourself, your image keeps shifting. And you change with it. It could destroy you, drive you mad. It could set you free. Max Payne"};
+const char message50[] PROGMEM = {"There are no choices. Nothing but a straight line. The illusion comes afterwards, when you ask 'why me?' and 'what if?'. When you look back and see the branches, like a pruned bonsai tree, or forked lightning. If you had done something differently, it wouldn't be you, it would be someone else looking back, asking a different set of questions.   Max Payne"};
+const char message51[] PROGMEM = {"I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration. I will face my fear. I will permit it to pass over me and through me. And when it has gone past I will turn the inner eye to see its path. Where the fear has gone there will be nothing. Only I will remain.   Bene Gesserit Litany Against Fear."};
+const char message52[] PROGMEM = {"What is great in man is that he is a bridge and not a goal.   Friedrich Nietzsche"};
+const char message53[] PROGMEM = {"No shepherd, and one herd! Everyone wants the same, everyone is the same: whoever feels different goes wilingly into the madhouse.   Friedrich Nietzsche"};
+const char message54[] PROGMEM = {"How can I tell that the past isn't a fiction designed to account for the discrepancy between my immediate physical sensations and my state of mind?   Douglas Adams"};
+const char message55[] PROGMEM = {"Remember that time slurs over everything, let all deeds fade, blurs all writings and kills all memories. Exempt are only those which dig into the hearts of men by love.   Aristotle"};
+const char message56[] PROGMEM = {"Eternity is in love with the productions of time.   William Blake"};
+const char message57[] PROGMEM = {"Being with you and not being with you is the only way I have to measure time.   Jorge Luis Borges"};
+const char message58[] PROGMEM = {"Time forks perpetually toward innumerable futures.   Jorge Luis Borges"};
+const char message59[] PROGMEM = {"When Youth and Pleasure meet To chase the glowing Hours with flying feet.   Lord Byron"};
+const char message60[] PROGMEM = {"Swerve me? The path to my fixed purpose is laid with iron rails, whereon my soul is grooved to run. Over unsounded gorges, through the rifled hearts of mountains, under torrents' beds, unerringly I rush! Naught's an obstacle, naught's an angle to the iron way!  'Moby Dick' Herman Melville"};
+const char message61[] PROGMEM = {"I do not live for what the world thinks of me, but for what I think of myself.    Jack London"};
+const char message62[] PROGMEM = {"Life is not always a matter of holding good cards, but sometimes, playing a poor hand well.   Jack London"};
+const char message63[] PROGMEM = {"Sunshine cannot bleach the snow, Nor time unmake what poets know.   Ralph Waldo Emerson"};
 
 const char * const string_table[] PROGMEM =
 {
@@ -118,6 +133,22 @@ const char * const string_table[] PROGMEM =
   message45,
   message46,
   message47,
+  message48,
+  message49,
+  message50,
+  message51,
+  message52,
+  message53,
+  message54,
+  message55,
+  message56,
+  message57,
+  message58,
+  message59,
+  message60,
+  message61,
+  message62,
+  message63
 };
 
 void setup()
@@ -181,7 +212,7 @@ void loop()
 	while (quoteToDisplay == lastRandomQuote) 
 	{
 		// sizeof(string_table) as upper limit produces incorrect results (as long as my understanding of what it should represent are concerned);
-		quoteToDisplay = random(0, 47);
+		quoteToDisplay = random(0, 63);
 	}
 
 	lastRandomQuote = quoteToDisplay;

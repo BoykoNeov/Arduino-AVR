@@ -6,9 +6,9 @@
 
 .extern longvar
 
-.global DecrementBy1
+.global DecrementGlobalBy1
   
-  DecrementBy1:
+  DecrementGlobalBy1:
   
   lds r18, longvar   // lds - LoadDirect from Dataspace (the data space consists of the register file, I/O memory and internal SRAM)
   lds r19, longvar+1
@@ -17,4 +17,8 @@
   movw r24, r20      // moves the variable to result return registers r25:r22
   movw r22, r18
   dec r22            // decrements the low byte by 1 (generaly, the whole number is decremented by 1, but funny things happen, when the low byte is 0 ;) )
+  sts longvar, r22   // write back registers to memory
+  sts longvar+1, r23
+  sts longvar+2, r24
+  sts longvar+3, r25
   ret

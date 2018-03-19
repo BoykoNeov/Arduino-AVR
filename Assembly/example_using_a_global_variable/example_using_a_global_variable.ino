@@ -1,8 +1,8 @@
 extern "C" {
-  long DecrementBy1();
+  void DecrementGlobalBy1();
 }
 
- long longvar = 0;
+long longvar = 0;
  
 char inData[20]; // Allocate some space for the string
 char inChar = 1; // Where to store the character read
@@ -30,7 +30,7 @@ void loop()
     Serial.print("You entered: ");
     Serial.println(userInput);
     longvar = atol(userInput);
-    longvar = DecrementBy1();
+    DecrementGlobalBy1();
     Serial.print("result: ");
     Serial.println(longvar);
     Serial.println();

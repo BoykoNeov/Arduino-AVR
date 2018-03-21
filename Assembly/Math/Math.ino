@@ -3,6 +3,7 @@ extern "C" {
   int16_t MultiplyTwo8SsignedBitValuesUsingMuls(int8_t a, int8_t b);
   int16_t Multiply8bitSignedWithUnsignedUsingMulsu(int8_t a, uint8_t b);
   uint16_t Multiply8BitBy2UsingLslAndRol(uint8_t a, uint8_t b);
+  uint16_t ManualMultiplyTwo8BitNumbers(uint8_t a, uint8_t b);
 }
 
 long functionToCall = 0;
@@ -25,13 +26,15 @@ const char functionMessage1[] PROGMEM = {"1 - Multiply two 8-bit unsigned intege
 const char functionMessage2[] PROGMEM = {"2 - Multiply two 8-bit signed integers, using muls instruction"};
 const char functionMessage3[] PROGMEM = {"3 - Multiply one 8-bit signed int with one 8-bit unsigned int, using mulsu instruction"};
 const char functionMessage4[] PROGMEM = {"4 - Multiply one 8-bit unsigned int by 2 using lsl and rol instrucions - second variable - how many times to repeat the operation"};
+const char functionMessage5[] PROGMEM = {"5 - Miltiply two 8-bit unsigned ints manually"};
 
 const char * const string_table[] PROGMEM =
 {
   functionMessage1,
   functionMessage2,
   functionMessage3,
-  functionMessage4
+  functionMessage4,
+  functionMessage5
 };
 
 void setup()
@@ -146,6 +149,14 @@ void loop()
         uint8_t b = (uint8_t)secondVariable;
         result = (long)Multiply8BitBy2UsingLslAndRol(a, b);
       }
+
+      case 5:
+      {
+        uint8_t a = (uint8_t)firstVariable;
+        uint8_t b = (uint8_t)secondVariable;
+        result = (long)ManualMultiplyTwo8BitNumbers(a, b);
+      }
+      
     }
     
     Serial.print("result: ");

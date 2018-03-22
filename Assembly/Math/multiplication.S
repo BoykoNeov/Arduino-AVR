@@ -1,4 +1,4 @@
-// all based on examples from https://sites.google.com/site/avrasmintro/home/2b-basic-math
+// based on examples from https://sites.google.com/site/avrasmintro/home/2b-basic-math
 
 #define _SFR_ASM_COMPAT 1
 #define __SFR_OFFSET 0
@@ -6,12 +6,13 @@
 
 #include <avr/io.h>
 
-
   .global MultiplyTwo8UnsignedBitValuesUsingMul
   .global MultiplyTwo8SsignedBitValuesUsingMuls
   .global Multiply8bitSignedWithUnsignedUsingMulsu
   .global Multiply8BitBy2UsingLslAndRol
   .global ManualMultiplyTwo8BitNumbers
+  .global MultiplyTwo16BitUnsignedIntsUsingMul
+  .global ManualMultiplyTwo16BitUnsignedInts
 
   MultiplyTwo8UnsignedBitValuesUsingMul:  
     mul r24, r22
@@ -40,16 +41,61 @@
 
   ManualMultiplyTwo8BitNumbers:
   MUL8x8:
-    ldi r20,8        //Load bit counter into C
+    ldi r20 ,8        //Load bit counter into C
     lsr R24          //Shift low-bit of multiplier into Carry
 
   LOOP:
     brcc SKIP        //If carry is zero then skip addition 
-    add r25,r22      //Add multiplicand to answer
+    add r25 ,r22      //Add multiplicand to answer
 
   SKIP:
     ror r25          //Shift low-bit of high-byte 
     ror r24          //of answer into low-byte (and since this originally holds the multiplier, the same operaion feeds the carry and at the time of the counter reaching 0, all original bits of the multiplier have been shifted
     dec r20          //Decrement bit-counter
     brne LOOP        //Check if done all eight bits
+    ret
+
+ MultiplyTwo16BitUnsignedIntsUsingMul:
+    mul r25, r23  // multiply high bytes of multiplier and multiplicand
+    movw r20, r0  // move the result into high bytes of the answer
+    mul r24, r22  // multiply the low bytes
+    movw r18, r0  // move the result into low bytes of answer
+    mul r25, r22  // first cross multiply (high of multiplier to low of multiplicand)
+    add r19, r0   // add the product to middle bytes
+    adc r20, r1
+    clr r1        // clears the r1 register, which by convention contains 0
+    adc r21, r1   // by adding zero, the carry flag is added to the answer high byte
+    mul r24, r23  // repeat with the other cross product
+    add r19, r0
+    adc r20, r1
+    clr r1
+    adc r21, r1
+    movw r24, r20 // move the result to return registers
+    movw r22, r18
+    ret
+
+ ManualMultiplyTwo16BitUnsignedInts:
+  MUL16x16:
+    ldi r26, 16        //load bit counter into counter
+    clr 18            //clear answer registers
+    clr 19
+    clr 20
+    clr 21
+
+  LOOP16:
+    lsr r25           //shift high-bit of multiplier into carry
+    ror r24           //rotate lower bit into carry flag
+    brcc SKIP16         //If carry is zero then skip addition 
+    add r20, r22      //Add Multiplicand into high bytes of result
+    adc r21, r23
+
+  SKIP16:
+    ror r21          //rotate high bytes of result into lower bytes
+    ror r20          
+    ror r19
+    ror r18
+    dec r26          //Decrement bit-counter
+    brne LOOP16        //Check if done all sixteen bits
+    movw r24, r20   //move answer into return registers
+    movw r22, r18
     ret

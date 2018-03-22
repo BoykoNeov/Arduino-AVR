@@ -4,6 +4,8 @@ extern "C" {
   int16_t Multiply8bitSignedWithUnsignedUsingMulsu(int8_t a, uint8_t b);
   uint16_t Multiply8BitBy2UsingLslAndRol(uint8_t a, uint8_t b);
   uint16_t ManualMultiplyTwo8BitNumbers(uint8_t a, uint8_t b);
+  uint32_t MultiplyTwo16BitUnsignedIntsUsingMul(uint16_t a, uint16_t b);
+  uint32_t ManualMultiplyTwo16BitUnsignedInts(uint16_t a, uint16_t b);
 }
 
 long functionToCall = 0;
@@ -26,7 +28,9 @@ const char functionMessage1[] PROGMEM = {"1 - Multiply two 8-bit unsigned intege
 const char functionMessage2[] PROGMEM = {"2 - Multiply two 8-bit signed integers, using muls instruction"};
 const char functionMessage3[] PROGMEM = {"3 - Multiply one 8-bit signed int with one 8-bit unsigned int, using mulsu instruction"};
 const char functionMessage4[] PROGMEM = {"4 - Multiply one 8-bit unsigned int by 2 using lsl and rol instrucions - second variable - how many times to repeat the operation"};
-const char functionMessage5[] PROGMEM = {"5 - Miltiply two 8-bit unsigned ints manually"};
+const char functionMessage5[] PROGMEM = {"5 - Multiply two 8-bit unsigned ints manually"};
+const char functionMessage6[] PROGMEM = {"6 - Multiply two 16-bit unsigned ints using mul)"};
+const char functionMessage7[] PROGMEM = {"7 - Multiply two 16-bit unsigned ints manually"};
 
 const char * const string_table[] PROGMEM =
 {
@@ -34,7 +38,9 @@ const char * const string_table[] PROGMEM =
   functionMessage2,
   functionMessage3,
   functionMessage4,
-  functionMessage5
+  functionMessage5,
+  functionMessage6,
+  functionMessage7
 };
 
 void setup()
@@ -115,7 +121,9 @@ void loop()
 
   if (functionToCallRead && firstVariableRead && secondVariableRead)
   {
-    long result = 0;
+    bool answerIsSigned = false;
+    uint64_t unsignedResult = 0;
+    int64_t signedResult = 0;
  // Serial.println(buffer); //debug check
     
     switch (functionToCall)
@@ -124,7 +132,7 @@ void loop()
       {
        byte a = (byte)firstVariable;
        byte b = (byte)secondVariable;
-       result = (long)(MultiplyTwo8UnsignedBitValuesUsingMul(a, b));
+       unsignedResult = MultiplyTwo8UnsignedBitValuesUsingMul(a, b);
       }
        break;
        
@@ -132,35 +140,73 @@ void loop()
       {
       int8_t a = (int8_t)firstVariable;
       int8_t b = (int8_t)secondVariable;
-      result = (long)MultiplyTwo8SsignedBitValuesUsingMuls(a, b);
-      }
+      signedResult = MultiplyTwo8SsignedBitValuesUsingMuls(a, b);
+      answerIsSigned = true;
       break;
+      }
 
       case 3:
       {
         int8_t a = (int8_t)firstVariable;
         uint8_t b = (uint8_t)secondVariable;
-        result = (long)Multiply8bitSignedWithUnsignedUsingMulsu(a, b);
+        signedResult = Multiply8bitSignedWithUnsignedUsingMulsu(a, b);
+        answerIsSigned = true;
+        break;
       }
-
+      
       case 4:
       {
         uint8_t a = (uint8_t)firstVariable;
         uint8_t b = (uint8_t)secondVariable;
-        result = (long)Multiply8BitBy2UsingLslAndRol(a, b);
+        unsignedResult = Multiply8BitBy2UsingLslAndRol(a, b);
+        break;
       }
 
       case 5:
       {
         uint8_t a = (uint8_t)firstVariable;
         uint8_t b = (uint8_t)secondVariable;
-        result = (long)ManualMultiplyTwo8BitNumbers(a, b);
+        unsignedResult = ManualMultiplyTwo8BitNumbers(a, b);
+        break;
       }
-      
+
+      case 6:
+      {
+        uint16_t a = (uint16_t)firstVariable;
+        uint16_t b = (uint16_t)secondVariable;
+        unsignedResult = MultiplyTwo16BitUnsignedIntsUsingMul(a, b);
+        break;
+      }
+
+      case 7:
+      {
+        uint16_t a = (uint16_t)firstVariable;
+        uint16_t b = (uint16_t)secondVariable;
+        unsignedResult = ManualMultiplyTwo16BitUnsignedInts(a, b);
+      }
     }
     
     Serial.print("result: ");
-    Serial.println(result);
+
+    if (answerIsSigned)
+    {
+       char buffer2[100];
+       sprintf(buffer2, "%ld", signedResult); 
+       Serial.println(buffer2);  
+//       sprintf(buffer2, "%0ld", signedResult%1000000L); 
+//       Serial.println(buffer2);  
+     // Serial.println(signedResult);
+    }
+    else
+    {
+       char buffer2[100];
+       sprintf(buffer2, "%lu", unsignedResult); 
+       Serial.println(buffer2);  
+//       sprintf(buffer2, "%0ld", unsignedResult%1000000L); 
+//       Serial.println(buffer2);  
+    //  Serial.println(unsignedResult);
+    }
+    
     Serial.println();
 
     functionToCallRead = false;

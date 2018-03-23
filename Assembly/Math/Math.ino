@@ -1,3 +1,5 @@
+#include <math.h>
+
 extern "C" {
   uint16_t MultiplyTwo8UnsignedBitValuesUsingMul(uint8_t a, uint8_t b);
   int16_t MultiplyTwo8SsignedBitValuesUsingMuls(int8_t a, int8_t b);
@@ -6,6 +8,7 @@ extern "C" {
   uint16_t ManualMultiplyTwo8BitNumbers(uint8_t a, uint8_t b);
   uint32_t MultiplyTwo16BitUnsignedIntsUsingMul(uint16_t a, uint16_t b);
   uint32_t ManualMultiplyTwo16BitUnsignedInts(uint16_t a, uint16_t b);
+  uint64_t ManuallyMultiplyTwo32BitUnsignedInts(uint32_t a, uint32_t b);
 }
 
 long functionToCall = 0;
@@ -31,6 +34,7 @@ const char functionMessage4[] PROGMEM = {"4 - Multiply one 8-bit unsigned int by
 const char functionMessage5[] PROGMEM = {"5 - Multiply two 8-bit unsigned ints manually"};
 const char functionMessage6[] PROGMEM = {"6 - Multiply two 16-bit unsigned ints using mul)"};
 const char functionMessage7[] PROGMEM = {"7 - Multiply two 16-bit unsigned ints manually"};
+const char functionMessage8[] PROGMEM = {"8 - Multiply two 32-bit unsigned ints manually"};
 
 const char * const string_table[] PROGMEM =
 {
@@ -40,7 +44,8 @@ const char * const string_table[] PROGMEM =
   functionMessage4,
   functionMessage5,
   functionMessage6,
-  functionMessage7
+  functionMessage7,
+  functionMessage8
 };
 
 void setup()
@@ -124,7 +129,6 @@ void loop()
     bool answerIsSigned = false;
     uint64_t unsignedResult = 0;
     int64_t signedResult = 0;
- // Serial.println(buffer); //debug check
     
     switch (functionToCall)
     {
@@ -183,36 +187,64 @@ void loop()
         uint16_t a = (uint16_t)firstVariable;
         uint16_t b = (uint16_t)secondVariable;
         unsignedResult = ManualMultiplyTwo16BitUnsignedInts(a, b);
+        break;
       }
+
+      case 8:
+      {
+       uint32_t a = (uint32_t)firstVariable;
+       uint32_t b = (uint32_t)secondVariable;
+       unsignedResult = ManuallyMultiplyTwo32BitUnsignedInts(a, b);
+        break;
+      }
+
+      default:
+      break;
     }
     
     Serial.print("result: ");
 
     if (answerIsSigned)
-    {
-       char buffer2[100];
-       sprintf(buffer2, "%ld", signedResult); 
-       Serial.println(buffer2);  
-//       sprintf(buffer2, "%0ld", signedResult%1000000L); 
-//       Serial.println(buffer2);  
-     // Serial.println(signedResult);
+    {      
+      if (signedResult < 0)
+      {
+        unsignedResult = (uint64_t)(signedResult * -1);
+        Serial.print('-');
+      }
+      else
+      {
+        unsignedResult = (uint64_t)(signedResult);
+      }
     }
-    else
-    {
-       char buffer2[100];
-       sprintf(buffer2, "%lu", unsignedResult); 
-       Serial.println(buffer2);  
-//       sprintf(buffer2, "%0ld", unsignedResult%1000000L); 
-//       Serial.println(buffer2);  
-    //  Serial.println(unsignedResult);
-    }
-    
+
+    SerialPrintBig(unsignedResult);
     Serial.println();
+      
+    // the code bellow doesnt work
+    // int length = snprintf( NULL, 0, "%u", unsignedResult );
+    // char* str = malloc( length + 1 );
+    // snprintf( str, length + 1, "%u", unsignedResult);
+    // Serial.print(str);    
+    // Serial.println(unsignedResult);
 
     functionToCallRead = false;
     firstVariableRead = false;
     secondVariableRead = false;
   }
+}
+
+void SerialPrintBig(uint64_t value)
+{
+    const int NUM_DIGITS    = log10(value) + 1;
+    char sz[NUM_DIGITS + 1];
+    
+    sz[NUM_DIGITS] =  0;
+    for ( size_t i = NUM_DIGITS; i--; value /= 10)
+    {
+        sz[i] = '0' + (value % 10);
+    }
+    
+    Serial.print(sz);
 }
 
 char* serialString()

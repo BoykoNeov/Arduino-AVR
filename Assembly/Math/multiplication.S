@@ -13,7 +13,8 @@
   .global ManualMultiplyTwo8BitNumbers
   .global MultiplyTwo16BitUnsignedIntsUsingMul
   .global ManualMultiplyTwo16BitUnsignedInts
-
+  .global ManuallyMultiplyTwo32BitUnsignedInts
+  
   MultiplyTwo8UnsignedBitValuesUsingMul:  
     mul r24, r22
     movw r24, r0
@@ -98,4 +99,58 @@
     brne LOOP16        //Check if done all sixteen bits
     movw r24, r20   //move answer into return registers
     movw r22, r18
+    ret
+
+    ManuallyMultiplyTwo32BitUnsignedInts:
+  MUL32x32:
+    push r17
+    push r16
+    push r15
+    push r14
+    push r13
+    push r12
+    push r11
+    push r10
+    ldi r26, 32
+    movw r16, r24
+    movw r14, r22
+    movw r12, r20
+    movw r10, r18
+    clr r25
+    clr r24
+    clr r23
+    clr r22
+    clr r21
+    clr r20
+    clr r19
+    clr r18
+  LOOP32:
+    lsr r17
+    ror r16
+    ror r15
+    ror r14
+    brcc SKIP32
+    add r22, r10 
+    adc r23, r11
+    adc r24, r12
+    adc r25, r13
+  SKIP32:
+    ror r25
+    ror r24
+    ror r23
+    ror r22
+    ror r21
+    ror r20
+    ror r19
+    ror r18
+    dec r26
+    brne LOOP32
+    pop r10
+    pop r11
+    pop r12
+    pop r13
+    pop r14
+    pop r15
+    pop r16
+    pop r17
     ret

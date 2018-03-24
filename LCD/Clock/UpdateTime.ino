@@ -121,6 +121,18 @@ void UpdateTime()
     year--;
     month = 11;
    }
+
+   //Probably this depends a lot from the specific crystal, but currently the clock adds about 15 seconds per day
+   if (hours == 0 && minutes == 0 && seconds >= 30 && !timeCorrectedToday)
+   {
+    seconds = 15;
+    timeCorrectedToday = true;
+   }
+
+   if (hours == 0 && minutes == 1)
+   {
+    timeCorrectedToday = false;
+   }
 }
 
 void UpdateLeapYear()

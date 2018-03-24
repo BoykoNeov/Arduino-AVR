@@ -11,12 +11,12 @@ const byte d5 = 5; //d5
 const byte d6 = 6; //d6
 const byte d7 = 7; //d7
 
-int hours = 12;
-int minutes = 45;
+int hours = 0;
+int minutes = 46;
 int seconds = 0;
 
 int month = 2;
-int monthDay = 13;
+int monthDay = 25;
 int year = 2018;
 
 String monthNames[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -26,6 +26,7 @@ byte monthLengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 unsigned long oldMillis = 0;
 unsigned long currentMillis = 0;
 bool isLeapYear = false;
+bool timeCorrectedToday = false;
 
 // Cursor and editing/selecting variables
 const byte blackChar[8] = 
@@ -144,6 +145,8 @@ if (selectSwitch)
   byte dayOfWeek = ReturnDayOfWeek(year, month, monthDay);
   lcd.print(' ');
   lcd.print(daysOfWeek[dayOfWeek]);
+  lcd.setCursor(15,0);
+  lcd.print(' ');
   
   lcd.setCursor(0, 1);
  

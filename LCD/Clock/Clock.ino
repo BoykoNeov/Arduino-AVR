@@ -62,6 +62,8 @@ LiquidCrystal lcd(resistorSelect, enable, d4, d5, d6, d7);
 byte oldPressedButton = 0;
 byte currentPressedButton = 0;
 
+
+byte sentinelBit = 0; // For determining last write EEPROM location
 unsigned int EEPROMFreeIndex = 0;
 
 void setup() 
@@ -72,18 +74,17 @@ void setup()
   
   Serial.begin(9600);
   EEPROMFreeIndex = DetermineFirstFreeEEPROMIndex();
+  Serial.println("EEPROM free index:");
   Serial.println(EEPROMFreeIndex);
 
-  if (EEPROMFreeIndex >= EEPROM.length())
-  {
-    EraseEEPROM();
-    EEPROMFreeIndex = 0;
-  }
-
 //because we dont need the last starting index ot free EEPROM, but the actual data, we substract 6 (Date/Time is 6 bytes long);
-  if (EEPROMFreeIndex > 5)
+  if ((EEPROMFreeIndex < EEPROM.length + 1)
   {
     ReadDateTimeFromEEPROM(EEPROMFreeIndex - 6);
+  }
+  else
+  {
+    ResetEEPROMIndex();
   }
 }
 
@@ -144,7 +145,7 @@ if (selectSwitch)
 
   byte dayOfWeek = ReturnDayOfWeek(year, month, monthDay);
   lcd.print(' ');
-  lcd.print(daysOfWeek[dayOfWeek]);
+  lcd.print(daysOfWeek[dayOfWeek] + " ");
   lcd.setCursor(15,0);
   lcd.print(' ');
   

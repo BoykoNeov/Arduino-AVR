@@ -57,8 +57,7 @@ void UpdateTime()
       // if EEPROM.length() returns 1024 (as it is on 382p), the last byte is 1023, and we need at least 6 bytes for the Date/Time, this is byte 1018, so 1024 - 6 = 
       if (EEPROMFreeIndex > EEPROM.length() - 6)
         {
-          EraseEEPROM();
-          EEPROMFreeIndex = 0;
+          ResetEEPROMIndex();
         }
 
        WriteDateTimeToEEPROM(EEPROMFreeIndex);
@@ -125,7 +124,7 @@ void UpdateTime()
    //Probably this depends a lot from the specific crystal, but currently the clock adds about 15 seconds per day
    if (hours == 0 && minutes == 0 && seconds >= 30 && !timeCorrectedToday)
    {
-    seconds = 15;
+    seconds = 5;
     timeCorrectedToday = true;
    }
 
@@ -229,4 +228,3 @@ byte WhatDayIsFirstJan(int givenYear)
 
   return day;
 }
-

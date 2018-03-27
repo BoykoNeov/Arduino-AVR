@@ -50,12 +50,13 @@ void UpdateTime()
     minutes++;
 
     //this usually means that a minute has passed naturally in clock operation, but to avoid writing to EEPROM when manually editing, first check that editSwitch is off
-    // Write Date/Time every 2 minutes
-    if (!editSwitch && minutes % 2 == 0)
+    // Write Date/Time every 1 minute
+    if (!editSwitch  // && minutes % 1 == 0
+    )
     {
-      // if this is true, means EEPROM is fully written
-      // if EEPROM.length() returns 1024 (as it is on 382p), the last byte is 1023, and we need at least 6 bytes for the Date/Time, this is byte 1018, so 1024 - 6 = 
-      if (EEPROMFreeIndex > EEPROM.length() - 6)
+      // if this bellow is true, means EEPROM is fully written
+      // if EEPROM.length() returns 1024 (as it is on ATMega 382p), the last byte is 1023, and we need at least 6 bytes for the Date/Time, this is byte 1018, so 1024 - 6 = 
+      if (EEPROMFreeIndex > EEPROM.length() - 6) // In practice if it cant find a free index, it will return EEPROM.length() + 1, but this is in case of a an EEPROM with previously unrelated data, or using the older algorithm of returning the last free index
         {
           ResetEEPROMIndex();
         }

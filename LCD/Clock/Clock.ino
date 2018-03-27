@@ -12,11 +12,11 @@ const byte d6 = 6; //d6
 const byte d7 = 7; //d7
 
 int hours = 0;
-int minutes = 46;
+int minutes = 14;
 int seconds = 0;
 
 int month = 2;
-int monthDay = 25;
+int monthDay = 27;
 int year = 2018;
 
 String monthNames[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -49,7 +49,6 @@ bool editSwitch = false;
 byte editActiveSecondsCounter = 0;
 byte selectActiveSecondsCounter = 0;
 
-
 LiquidCrystal lcd(resistorSelect, enable, d4, d5, d6, d7);
 
 #define btnRIGHT  1
@@ -62,7 +61,6 @@ LiquidCrystal lcd(resistorSelect, enable, d4, d5, d6, d7);
 byte oldPressedButton = 0;
 byte currentPressedButton = 0;
 
-
 byte sentinelBit = 0; // For determining last write EEPROM location
 unsigned int EEPROMFreeIndex = 0;
 
@@ -71,19 +69,22 @@ void setup()
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   lcd.createChar(0, blackChar);
+
+  //serial com is for debugging
+  EEPROMFreeIndex = DetermineFirstFreeEEPROMIndex();
   
   Serial.begin(9600);
-  EEPROMFreeIndex = DetermineFirstFreeEEPROMIndex();
   Serial.println("EEPROM free index:");
   Serial.println(EEPROMFreeIndex);
 
 //because we dont need the last starting index ot free EEPROM, but the actual data, we substract 6 (Date/Time is 6 bytes long);
-  if ((EEPROMFreeIndex < EEPROM.length + 1)
+  if (EEPROMFreeIndex < EEPROM.length() + 1)
   {
     ReadDateTimeFromEEPROM(EEPROMFreeIndex - 6);
   }
   else
   {
+    TrySetDateTimeFromLastCells();
     ResetEEPROMIndex();
   }
 }

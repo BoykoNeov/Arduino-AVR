@@ -1,0 +1,25 @@
+There are five buffers used by the TWI and Wire library. They are defined as 32 bytes.
+
+In wire.h:
+
+#define BUFFER_LENGTH 32
+In Wire.cpp:
+
+uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
+...
+uint8_t TwoWire::txBuffer[BUFFER_LENGTH];
+In twi.h:
+
+  #define TWI_BUFFER_LENGTH 32
+In twi.c:
+
+static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];
+...
+static uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
+...
+static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
+So immediately you are using 5 x 32 bytes (160 bytes).
+
+You could increase that to (say) 64 bytes, bearing in mind your 160 byte overhead is now 320 bytes, and you don't have a lot of RAM.
+
+The comments about endTransmission() are correct. After a Wire.beginTransmission() nothing is actually transmitted until the endTransmission() call. This lets you fill up the buffer at your leisure, and then let the library do the writes in a fairly timing-specific way.

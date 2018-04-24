@@ -1,0 +1,3 @@
+Writing a single byte to 24LC256 address actually writes the whole page (64 bytes long).
+So it's much more effective to write whole pages, instead of single bytes (speed + EEPROM life);
+Writing the whole EEPROM in page batches takes only 6 seconds!

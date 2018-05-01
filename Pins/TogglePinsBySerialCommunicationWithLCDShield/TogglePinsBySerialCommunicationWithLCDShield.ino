@@ -1,14 +1,40 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+
 char inData[20]; // Allocate some space for the string
 char inChar = 1; // Where to store the character read
 byte index = 0; // Index into array; where to store the character
-unsigned long longvar = 0;
-void setup()
-{
- Serial.begin(9600);
+byte pinToToggle;
+
+void setup() {
+
+pinMode(A0, OUTPUT);
+digitalWrite(A0, LOW);
+
+pinMode(A1, OUTPUT);
+digitalWrite(A1, LOW);
+
+pinMode(A2, OUTPUT);
+digitalWrite(A2, LOW);
+
+pinMode(A3, OUTPUT);
+digitalWrite(A3, LOW);
+
+pinMode(A4, OUTPUT);
+digitalWrite(A4, LOW);
+
+pinMode(A5, OUTPUT);
+digitalWrite(A5, LOW);
+
+Serial.begin(9600);
+lcd.begin(16, 2);             
+lcd.setCursor(0,0);
 }
 
 void loop() 
 {
+  lcd.print(millis() / 1000);
+  lcd.setCursor(0,0);
   static boolean needPrompt = true;
   char* userInput;
   
@@ -18,16 +44,18 @@ void loop()
     needPrompt=false;
   }
   
-  userInput= serialString();
+  userInput = serialString();
   if (userInput!=NULL)
   {
     Serial.print("You entered: ");
     Serial.println(userInput);
-    longvar = strtol(userInput, NULL, 0);
-    longvar /= 2;
-    Serial.print("result divided by 2: ");
-    Serial.println(longvar);
-    Serial.println();
+    pinToToggle = strtol(userInput, NULL, 0);
+    pinMode(pinToToggle, OUTPUT);
+    digitalWrite(pinToToggle, !digitalRead(pinToToggle));
+    Serial.print("Pin ");
+    Serial.print(pinToToggle);
+    Serial.print(" is ");
+    Serial.println(digitalRead(pinToToggle));
     needPrompt=true;
   }
 }
@@ -58,4 +86,3 @@ char* serialString()
   str[count]='\0'; // make it a zero terminated string
   return str;
 }
-

@@ -41,7 +41,7 @@ void setup()
 	uint64_t inputLength = sizeof(input) * 8;
 
 	// add 1 after the message
-	paddedInput[sizeof(input)] = 127;
+	paddedInput[sizeof(input)] = 128;
 
 	uint8_t lastMessageBytes[8];
 	lastMessageBytes[7] = inputLength;
@@ -91,6 +91,15 @@ void setup()
 
 		words[i] = currentWord;
 	}
+
+	for (uint8_t i = 0; i < 16; i++)
+	{
+		Serial.println(words[i], HEX);
+	}
+
+	// reading long from progmem:
+	//   unsigned long is 32 bit, use 32-bit 'dword'.
+	// unsigned long x = pgm_read_dword(&long_table[i]);
 }
 
 void loop()

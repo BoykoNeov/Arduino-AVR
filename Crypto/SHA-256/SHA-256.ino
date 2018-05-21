@@ -1,3 +1,5 @@
+//this is limited to 55 byte input
+
 #include <avr/pgmspace.h>
 
 uint32_t const roundConstants[] PROGMEM = {
@@ -11,7 +13,7 @@ uint32_t const roundConstants[] PROGMEM = {
 	0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 };
 
-uint32_t InitialHashes[] = {
+uint32_t overallHashes[] = {
 	0x6A09E667,
 	0xBB67AE85,
 	0x3C6EF372,
@@ -22,15 +24,17 @@ uint32_t InitialHashes[] = {
 	0x5BE0CD19
 };
 
+// this will be hashed, max size in bytes - 55
 uint8_t input[] = { 97, 98, 99 };
-uint8_t paddedInput[64];
 
+uint8_t paddedInput[64];
 uint32_t words[64];
 
 void setup()
 {
 	Serial.begin(9600);
-	Serial.println("test1");
+
+	uint32_t startMillis = millis();
 
 	//copy input
 	for (uint8_t i = 0; i < sizeof(input); i++)
@@ -43,38 +47,9 @@ void setup()
 	// add 1 after the message
 	paddedInput[sizeof(input)] = 128;
 
-	uint8_t lastMessageBytes[8];
-	lastMessageBytes[7] = inputLength;
-	lastMessageBytes[6] = inputLength >> 8;
-	lastMessageBytes[5] = inputLength >> 16;
-	lastMessageBytes[4] = inputLength >> 24;
-	lastMessageBytes[3] = inputLength >> 32;
-	lastMessageBytes[2] = inputLength >> 40;
-	lastMessageBytes[1] = inputLength >> 48;
-	lastMessageBytes[0] = inputLength >> 56;
-
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		paddedInput[i + 56] = lastMessageBytes[i];
-	}
-
-	// test
-	for (uint8_t i = 0; i < 8; i++)
-	{
-		Serial.print(i);
-		Serial.print(" length bytes ");
-		Serial.println(lastMessageBytes[i]);
-	}
-
-	Serial.println("-------------");
-
-
-	// test
-	for (uint8_t i = 0; i < 64; i++)
-	{
-		Serial.print(i);
-		Serial.print(" input byte number ");
-		Serial.println(paddedInput[i]);
+		paddedInput[i + 56] = inputLength >> 56 - (i * 8);
 	}
 
 	// convert padded input bytes to words
@@ -92,14 +67,55 @@ void setup()
 		words[i] = currentWord;
 	}
 
-	for (uint8_t i = 0; i < 16; i++)
+	for (int i = 16; i < 64; i++)
 	{
-		Serial.println(words[i], HEX);
+		uint32_t currentWord = SigmaOne(words[i - 2]) + words[i - 7] + SigmaZero(words[i - 15]) + words[i - 16];
+		words[i] = currentWord;
 	}
 
-	// reading long from progmem:
-	//   unsigned long is 32 bit, use 32-bit 'dword'.
-	// unsigned long x = pgm_read_dword(&long_table[i]);
+	uint32_t a = overallHashes[0];
+	uint32_t b = overallHashes[1];
+	uint32_t c = overallHashes[2];
+	uint32_t d = overallHashes[3];
+	uint32_t e = overallHashes[4];
+	uint32_t f = overallHashes[5];
+	uint32_t g = overallHashes[6];
+	uint32_t h = overallHashes[7];
+
+	for (int i = 0; i < 64; i++)
+	{
+		uint32_t roundConstant = pgm_read_dword(&roundConstants[i]);
+		uint32_t t1 = h + EpsilonOne(e) + Ch(e, f, g) + roundConstant + words[i];
+		uint32_t t2 = EpsilonZero(a) + Maj(a, b, c);
+		h = g;
+		g = f;
+		f = e;
+		e = d + t1;
+		d = c;
+		c = b;
+		b = a;
+		a = t1 + t2;
+	}
+
+	overallHashes[0] += a;
+	overallHashes[1] += b;
+	overallHashes[2] += c;
+	overallHashes[3] += d;
+	overallHashes[4] += e;
+	overallHashes[5] += f;
+	overallHashes[6] += g;
+	overallHashes[7] += h;
+
+	uint32_t endMillis = millis();
+
+	// prints the result
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		Serial.print(overallHashes[i], HEX);
+	}
+
+	Serial.println();
+	Serial.println(endMillis - startMillis);
 }
 
 void loop()

@@ -25,8 +25,6 @@ void setup(void) {
   
   
   tft.reset();
-  
-
   tft.initDisplay();
   
 //  testtext(RED);
@@ -62,111 +60,104 @@ void loop(void)
 //    delay(1000);
 
 tft.fillScreen(BLACK);
+  tft.setRotation(1); 
 
-for (uint16_t i = 0; i < 300; i++){
-  tft.setCursor(random(0, 140), random(0,200));
+  tft.setCursor(150, 150);
   tft.setTextColor(random(0,65000));
   tft.setTextSize(2);
   tft.println("C");
   tft.println("e");
   tft.println("s");
-  tft.println("t");
-  tft.println("i");
-  tft.println("t");
-  tft.println("o");
-  tft.println("!");
-  delay(20);
-}
+  tft.println(1);
 
-    delay (500);
-    // clear screen
-    tft.fillScreen(BLACK);
+  delay (2000);
+  tft.fillScreen(BLACK);   
 
-    // draw 10000 random pixels
-    for (uint16_t i = 0; i < 10000; i++)
-    {
-      tft.drawPixel(random(0,240), random(0,320), random(0, 65535));
-    }
+  // draw 10000 random pixels
+  for (uint16_t i = 0; i < 10000; i++)
+   {
+     tft.drawPixel(random(0,320), random(0,240), random(0, 65535));
+   }
 
-    delay(500);
-    tft.fillScreen(BLACK);
+   delay(500);
+   tft.fillScreen(BLACK);
 
     // draw 100 random lines
-    for (uint16_t i = 0; i < 100; i++)
-    {
-      tft.drawLine(random(0,240), random(0,320),random(0,240), random(0,320), random(0, 65535));
-    }
+   for (uint16_t i = 0; i < 100; i++)
+   {
+     tft.drawLine(random(0,320), random(0,240),random(0,320), random(0,240), random(0, 65535));
+   }
 
-    delay(500);
-    tft.fillScreen(BLACK);
+   delay(500);
+   tft.fillScreen(BLACK);
 
-    //draw blue
-    for (uint16_t i = 0; i < 320; i++)
-    {
-     tft.drawHorizontalLine(0, i, 240, i % 32);
-    }
+   //draw blue
+   for (uint16_t i = 0; i < 240; i++)
+   {
+    tft.drawHorizontalLine(0, i, 320, i % 32);
+   }
 
-    for (uint16_t i = 0; i < 240; i++)
-    {
-     tft.drawVerticalLine(i, 0, 320, i % 32);
-    }
+   for (uint16_t i = 0; i < 320; i++)
+   {
+    tft.drawVerticalLine(i, 0, 240, i % 32);
+   }
 
-    //draw green
-    for (uint16_t i = 0; i < 320; i++)
-    {
-     tft.drawHorizontalLine(0, i, 240, (i % 64) << 5);
-    }
+   //draw green
+   for (uint16_t i = 0; i < 240; i++)
+   {
+    tft.drawHorizontalLine(0, i, 320, (i % 64) << 5);
+   }
 
-    for (uint16_t i = 0; i < 240; i++)
-    {
-     tft.drawVerticalLine(i, 0, 320, (i % 64) << 5);
-    }
+   for (uint16_t i = 0; i < 320; i++)
+   {
+    tft.drawVerticalLine(i, 0, 240, (i % 64) << 5);
+   }
 
-    //draw red
-    for (uint16_t i = 0; i < 320; i++)
-    {
-     tft.drawHorizontalLine(0, i, 240, (i % 32) << 11);
-    }
+   //draw red
+   for (uint16_t i = 0; i < 240; i++)
+   {
+    tft.drawHorizontalLine(0, i, 320, (i % 32) << 11);
+   }
 
-    for (uint16_t i = 0; i < 240; i++)
-    {
-     tft.drawVerticalLine(i, 0, 320, (i % 32) << 11);
-    }
+   for (uint16_t i = 0; i < 320; i++)
+   {
+    tft.drawVerticalLine(i, 0, 240, (i % 32) << 11);
+   }
 
-    delay(500);
-    tft.fillScreen(BLACK);
+   delay(500);
+   tft.fillScreen(BLACK);
 
-    uint16_t y = 0;
-    uint16_t x = 0;
-    uint16_t red = 0;
-    uint16_t green = 0;
-    uint16_t blue = 0;
+   uint16_t y = 0;
+   uint16_t x = 0;
+   uint16_t red = 0;
+   uint16_t green = 0;
+   uint16_t blue = 0;
 
-    // cycle all colors
-    for (;red < 32; red++)
-    {
-      for (;green < 64; green++)
-      {
-        for (;blue < 32; blue++)
-        {
-          uint16_t color = blue;
-          color = color | (green << 5);
-          color = color | (red << 11);
+   // cycle all colors
+   for (;red < 32; red++)
+   {
+     for (;green < 64; green++)
+     {
+       for (;blue < 32; blue++)
+       {
+         uint16_t color = blue;
+         color = color | (green << 5);
+         color = color | (red << 11);
           
-          tft.drawPixel(y, x++, color);
+         tft.drawPixel(x++, y, color);
 
-          if (x == 320)
-           {
-             x = 0;
-             y++;
-           }
+         if (x == 320)
+          {
+            x = 0;
+            y++;
+          }
         }
         
-        blue = 0;
-      }
+       blue = 0;
+     }
       
-      green = 0;
-    }
+     green = 0;
+   }
 }
 
 // This must be tested - convert RGB values to color565
@@ -174,8 +165,6 @@ word ConvertRGB( byte R, byte G, byte B)
 {
   return ( ((R & 0xF8) << 8) | ((G & 0xFC) << 3) | (B >> 3) );
 }
-
-
 
 void testFillRoundRect() {
   tft.fillScreen(BLACK);

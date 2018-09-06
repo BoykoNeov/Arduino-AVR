@@ -140,9 +140,9 @@ void TFTLCD::drawChar(uint16_t x, uint16_t y, unsigned char c,
     for (uint8_t j = 0; j<8; j++) {
       if (line & 0x1) {
 	if (size == 1) // default size
-	  drawPixel(x+i, y+j, color);
+	  drawPixel(x-i, y+j, color);
 	else {  // big size
-	  fillRect(x+i*size, y+j*size, size, size, color);
+	  fillRect(x-i*size, y+j*size, size, size, color);
 	} 
       }
       line >>= 1;

@@ -876,7 +876,7 @@ void TFTLCD::reset(void) {
   if (_reset)
 	//*portOutputRegister(resetport) &= ~resetmask;  
     digitalWrite(_reset, LOW);
-  delay(2); 																					/////////////////Here is delay
+  delay(3); 																					/////////////////Here is delay
   if (_reset)
 	//*portOutputRegister(resetport)|= resetmask;  
     digitalWrite(_reset, HIGH);

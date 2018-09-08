@@ -23,9 +23,11 @@ void setup(void) {
   Serial.begin(9600);
   Serial.println("8 Bit LCD test!");
   
-  
+  delay(10);
   tft.reset();
+  delay(10);
   tft.initDisplay();
+  delay(10);
   
 //  testtext(RED);
 //  delay(2000);
@@ -60,7 +62,20 @@ void loop(void)
 //    delay(1000);
 
 tft.fillScreen(BLACK);
-  tft.setRotation(1); 
+  tft.setRotation(1);
+
+  tft.drawRect(10, 10, 100, 100, WHITE);
+  delay(500);
+  tft.fillRect(20,20, 100, 110, WHITE);
+  delay(500);
+  tft.fillScreen(GREEN);
+
+  for (uint8_t i = 0; i < 200; i++)
+  {
+    tft.drawCircle(random(0,320), random(0,240), random(2, 150), BLACK);
+  }
+  tft.drawCircle(100,100,100, BLACK);
+  delay(500);
 
   tft.setCursor(150, 150);
   tft.setTextColor(random(0,65000));
@@ -73,8 +88,8 @@ tft.fillScreen(BLACK);
   delay (2000);
   tft.fillScreen(BLACK);   
 
-  // draw 10000 random pixels
-  for (uint16_t i = 0; i < 10000; i++)
+  // draw 20000 random pixels
+  for (uint16_t i = 0; i < 20000; i++)
    {
      tft.drawPixel(random(0,320), random(0,240), random(0, 65535));
    }
@@ -82,8 +97,8 @@ tft.fillScreen(BLACK);
    delay(500);
    tft.fillScreen(BLACK);
 
-    // draw 100 random lines
-   for (uint16_t i = 0; i < 100; i++)
+    // draw 200 random lines
+   for (uint16_t i = 0; i < 200; i++)
    {
      tft.drawLine(random(0,320), random(0,240),random(0,320), random(0,240), random(0, 65535));
    }
@@ -126,6 +141,20 @@ tft.fillScreen(BLACK);
 
    delay(500);
    tft.fillScreen(BLACK);
+
+   testtriangles();
+   testfilltriangles();
+   testdrawrects(YELLOW);
+   testfillrects(YELLOW, MAGENTA);
+   testdrawcircles(9, CYAN);
+   delay(500);
+
+   tft.fillScreen(YELLOW);
+   delay(200);
+   tft.fillScreen(RED);
+   delay(200);
+
+   
 
    uint16_t y = 0;
    uint16_t x = 0;
@@ -184,10 +213,10 @@ void testRoundRect() {
 
 void testtriangles() {
   tft.fillScreen(BLACK);
-  for (uint16_t i=0; i<tft.width()/2; i+=5) {
-    tft.drawTriangle(tft.width()/2, tft.height()/2-i,
-                     tft.width()/2-i, tft.height()/2+i,
-                     tft.width()/2+i, tft.height()/2+i, tft.Color565(0, 0, i));
+  for (uint16_t i=0; i<tft.height()/2; i+=5) {
+    tft.drawTriangle(tft.height()/2, tft.width()/2-i,
+                     tft.height()/2-i, tft.width()/2+i,
+                     tft.height()/2+i, tft.width()/2+i, tft.Color565(0, 0, i));
   }
 }
 

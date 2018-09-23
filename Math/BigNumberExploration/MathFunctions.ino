@@ -64,3 +64,9 @@ BigNumber cosineFromDegrees (const BigNumber y, BigNumber precision)
   val = x * val;
   return val;
 } // end of function sine
+
+BigNumber degreesToRadians (const BigNumber y)
+{
+  
+}
+

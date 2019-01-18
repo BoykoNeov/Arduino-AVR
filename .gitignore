@@ -18,6 +18,7 @@ v14/
 *.bak
 *.swp
 *~.nib
+*.hint
 local.properties
 .classpath
 .settings/

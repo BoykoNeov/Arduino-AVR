@@ -22,8 +22,22 @@ void PrintNumericValue(uint16_t value)
 
 		lcd.print(value);
 	}
-	else
+
+	return;
+}
+
+void ResetSetMenuTimer()
+{
+	setMenuTimer = 5000;
+	return;
+}
+
+void SetActiveTimerToSetTimerWhenFirstModification()
+{
+	if (currentTimerOnOFFState == 2 && setForTheFirstTime == true)
 	{
+		current_On_Time = on_Time;
+		current_Off_Time = off_Time;
 		return;
 	}
 }

@@ -1,4 +1,6 @@
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
+
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
 int lcd_key = 0;
@@ -11,15 +13,40 @@ int adc_key_in = 0;
 #define btnNONE   5
 
 // starts with 1 hour off and on
-uint32_t on_Time = 3600000;
-uint32_t off_Time = 3600000;
-uint32_t current_On_Time = on_Time;
-uint32_t current_Off_Time = off_Time;
+uint32_t on_Time = 1000;
+uint32_t off_Time = 1000;
+uint32_t current_On_Time = 1000;
+uint32_t current_Off_Time = 1000;
+
+// The previously pressed key
 uint8_t lastKeyPressed = btnNONE;
+
 uint32_t timeOfLastButtonAction = 0;
+
+// multiplies effect of butoons presses
 uint32_t timeChangeMultiplier = 1;
+
 uint8_t currentTimerOnOFFState = 2; // 1 on, 0 off, 2 - off , timers not counting
+
+uint8_t lastActiveState = 1; //TODO read from EEPROM
+
 uint32_t millisOfLastTimeChange = 0;
+
+// registers if any key was pressed after boot, the idea is to disable the down arrow display (meaning autostart, possibly signaling power down has happened)
+bool anyKeyPressed = false;
+
+// Timer for switching from menu setting reset on/off timer values to active state
+uint32_t setMenuTimer = 10000;
+
+// Used for when setting for the first time, also change the current timer values
+bool setForTheFirstTime = true;
+
+uint8_t setTimerEEPROMPosition = 0;
+uint8_t setTimerSentinelBit = 0;
+uint8_t activeTimerSentinelBit = 0;
+uint16_t activeTimerEEPROMPosition = 25;
+uint32_t setOnTimerValueFromEEPROM = 0;
+uint32_t setOffTimerValueFROMEEPROM = 0;
 
 // left pointing dense arrow 
 const byte customChar[] PROGMEM = {
@@ -33,6 +60,18 @@ const byte customChar[] PROGMEM = {
   B00001
 };
 
+// Down arrow
+const byte customChar2[] PROGMEM = {
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B11111,
+  B01110,
+  B00100
+};
+
 void setup()
 {
 	delay(60);
@@ -40,15 +79,46 @@ void setup()
 	delay(60);
 	lcd.clear();
 	delay(60);
+	lcd.noCursor();
+	lcd.noBlink();
 
 	uint8_t customCharOne[8];
+	uint8_t downArrow[8];
 	for (size_t i = 0; i < 8; i++)
 	{
 		customCharOne[i] = pgm_read_word_near(customChar + i);
+		downArrow[i] = pgm_read_word_near(customChar2 + i);
 	}
 
 	lcd.createChar(0, customCharOne);
-	Serial.begin(9600);
+	lcd.createChar(1, downArrow);
+
+	// Load Set Timers from EEPROM, set the set timer EEPROM position and sentinel bit and set the active timers to set timers
+	LoadSetTimersFromEEPROM();
+	
+	lcd.setCursor(0, 0);
+	lcd.print("PRESS ANY KEY TO");
+	lcd.setCursor(0, 1);
+	lcd.print("SET TIMERS");
+
+	uint32_t StartTimer = millis();
+
+	while (!anyKeyPressed && millis() - StartTimer < 10000) 
+	{
+		uint8_t readKey = read_LCD_buttons();
+
+		if (readKey != btnNONE) 
+		{
+			anyKeyPressed = true;
+			delay(200);
+			break;
+		}
+	}
+
+	lcd.clear();
+	LoadSetTimersFromEEPROM();
+	setOnTimerValueFromEEPROM = on_Time;
+	setOffTimerValueFROMEEPROM = off_Time;
 }
 
 void loop()
@@ -83,15 +153,45 @@ void loop()
 				currentTimerOnOFFState = 0;
 			}
 		}
+		else if (currentTimerOnOFFState == 2) 
+		{
+			if (setMenuTimer > 1000) 
+			{
+				setMenuTimer -= 1000;
+			}
+			else 
+			{
+				setMenuTimer = 10000;
+				currentTimerOnOFFState = lastActiveState;
+			}
+		}
+	}
+
+	// When time was initialy set, active timers are no longer modified together with set timers
+	if (currentTimerOnOFFState != 2) 
+	{
+		setForTheFirstTime = false;
 	}
 
 	// If currently the timers are running, they are diplsayed and they are modified
 	if (currentTimerOnOFFState == 0 || currentTimerOnOFFState == 1)
 	{
-		lcd.setCursor(14, 0);
-		lcd.print("ON");
-		lcd.setCursor(13, 1);
-		lcd.print("OFF");
+		lcd.setCursor(11, 0);
+		lcd.print(" ");
+
+		// If no key was pressued durring start, we assume a power down startup
+		if (!anyKeyPressed) 
+		{		
+			lcd.write(uint8_t(1));
+		}
+		else 
+		{
+			lcd.print(" ");
+		}
+
+		lcd.print(" ON");
+		lcd.setCursor(11, 1);
+		lcd.print("  OFF");
 
 		lcd.setCursor(0, 0);
 
@@ -128,11 +228,6 @@ void loop()
 	} // if timers are not running the timer reset time is displayed and modified
 	else 
 	{
-		lcd.setCursor(10, 0);
-		lcd.print("SET ON");
-		lcd.setCursor(10, 1);
-		lcd.print("SET OF");
-
 		lcd.setCursor(0, 0);
 
 		uint32_t on_Time_in_Seconds = on_Time / 1000;
@@ -165,6 +260,11 @@ void loop()
 		PrintNumericValue(remainingOFFMinutes);
 		lcd.print(":");
 		PrintNumericValue(remainingOFFSeconds);
+
+		lcd.setCursor(10, 0);
+		lcd.print("SET ON");
+		lcd.setCursor(10, 1);
+		lcd.print("SET OF");
 	}
 
 	if (currentTimerOnOFFState == 0)
@@ -181,26 +281,22 @@ void loop()
 		lcd.setCursor(10, 1);
 		lcd.print(" ");
 	}
-	else
-	{
-		lcd.setCursor(10, 0);
-		lcd.print(" ");
-		lcd.setCursor(10, 1);
-		lcd.print(" ");
-	}
 
 	lcd_key = read_LCD_buttons();
 
+	// Reset time button effect multiplier to 1 if no button is hold down
 	if (lastKeyPressed == btnNONE && lcd_key != lastKeyPressed)
 	{
 		timeChangeMultiplier = 1;
 	}
 
+	// Delay between button action
 	if (millis() - timeOfLastButtonAction < 300)
 	{
 		return;
 	}
 
+	// Increase button effect multiplier
 	if (lastKeyPressed == lcd_key && lastKeyPressed != btnNONE)
 	{
 		// 100 hours
@@ -226,6 +322,7 @@ void loop()
 
 	case btnRIGHT:
 	{
+		anyKeyPressed = true;
 		uint32_t newValue = 0;
 		uint32_t *pointer_to_currently_displayed_timers;
 
@@ -234,6 +331,7 @@ void loop()
 			// if timers on not running, modify the current timer values
 			// pointer points to curren on time
 			pointer_to_currently_displayed_timers = &current_On_Time;
+			ResetSetMenuTimer();
 		}
 		else 
 		{
@@ -256,10 +354,13 @@ void loop()
 
 		lastKeyPressed = lcd_key;
 		timeOfLastButtonAction = millis();
+		SetActiveTimerToSetTimerWhenFirstModification();
+
 		break;
 	}
 	case btnLEFT:
 	{
+		anyKeyPressed = true;
 		uint32_t newValue = 0;
 		uint32_t *pointer_to_currently_displayed_timers;
 
@@ -270,6 +371,7 @@ void loop()
 		else
 		{
 			pointer_to_currently_displayed_timers = &on_Time;
+			ResetSetMenuTimer();
 		}
 
 		newValue = *pointer_to_currently_displayed_timers - (1000 * timeChangeMultiplier);
@@ -289,6 +391,7 @@ void loop()
 	}
 	case btnUP:
 	{
+		anyKeyPressed = true;
 		uint32_t newValue = 0;
 		uint32_t *pointer_to_currently_displayed_timers;
 
@@ -318,6 +421,7 @@ void loop()
 	}
 	case btnDOWN:
 	{
+		anyKeyPressed = true;
 		uint32_t newValue = 0;
 		uint32_t *pointer_to_currently_displayed_timers;
 
@@ -347,6 +451,8 @@ void loop()
 	}
 	case btnSELECT:
 	{
+		anyKeyPressed = true;
+
 		if (lastKeyPressed == btnSELECT)
 		{
 			break;
@@ -373,5 +479,21 @@ void loop()
 		lastKeyPressed = btnNONE;
 		break;
 	}
+	}
+
+	if (lcd_key != btnNONE) 
+	{
+		// If this is the first modification to the timers also change the active timer values
+		SetActiveTimerToSetTimerWhenFirstModification();
+
+		// Reset timer for swithing out of set menu, if any key is pressed
+		ResetSetMenuTimer();
+	}
+
+	if (currentTimerOnOFFState != 2 && (off_Time != setOffTimerValueFROMEEPROM || on_Time != setOnTimerValueFromEEPROM)) 
+	{
+		off_Time = setOffTimerValueFROMEEPROM;
+		on_Time = setOnTimerValueFromEEPROM;
+		SaveSetTimersToEEPROM();
 	}
 }

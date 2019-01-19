@@ -1,118 +1,94 @@
-//First 28 bytes of EEPROM will be used for set timer values
-void LoadSetTimersFromEEPROM()
+void ReadTimersFromEEPROM() 
 {
-	// initial value for the sentinel bit at EEPROM start
-	setTimerSentinelBit = EEPROM.read(0) >> 7;
-	setTimerEEPROMPosition = 0;
-
-	for (uint8_t i = 4; i < 24; i+=4)
+	for (uint16_t i = 0; i <= 1008; i += 14)
 	{
-		if (EEPROM.read(i) >> 7 != setTimerSentinelBit) 
+		uint8_t readByte = EEPROM.read(i);
+		currentEEPPROMposition = i;
+
+		if (readByte == 255) 
 		{
-			setTimerEEPROMPosition = i - 4;
+			currentEEPPROMposition = i;
 			break;
 		}
-
-		// If all sentinel bits are the same, flip the current
-		setTimerSentinelBit ^= 1;
 	}
 
-	uint16_t OnTimerFromEEPROM;
-	uint16_t OffTimerFromEEPROM;
-	EEPROM.get(setTimerEEPROMPosition, OnTimerFromEEPROM);
-	EEPROM.get(setTimerEEPROMPosition + 2, OffTimerFromEEPROM);
+	uint32_t setOn;
+	uint32_t setOff;
+	uint16_t currentOnMinutes;
+	uint16_t currentOffMinutes;
+	uint8_t activeState;
 
-	//Remove the sentinel bit
-	OnTimerFromEEPROM = (OnTimerFromEEPROM << 1) >> 1;
+	EEPROM.get(currentEEPPROMposition + 1, activeState);
+	EEPROM.get(currentEEPPROMposition + 2, setOn);
+	EEPROM.get(currentEEPPROMposition + 6, setOff);
+	EEPROM.get(currentEEPPROMposition + 10, currentOnMinutes);
+	EEPROM.get(currentEEPPROMposition + 12, currentOffMinutes);
+	lastActiveState = activeState;
 
-	// Set SetTimers to values got from EEPROM (precise to minutes)
-	on_Time = OnTimerFromEEPROM * 60000;
-	off_Time = OffTimerFromEEPROM * 60000;
+	if (lastActiveState >= 2) 
+	{
+		lastActiveState = 0;
+	}
+
+	// If due to bug or anything, the set timers are less than a second, set the off timer to 4 weeks, and the on timer to one second
+	if (setOff < 1000) 
+	{
+		setOff = 2419200000;
+	}
+
+	if (setOn < 1000) 
+	{
+		setOn = 1000;
+	}
+
+	on_Time = setOn;
+	off_Time = setOff;
+
+	// if the current timers are less than one minute, set them to set_timers
+	if (currentOnMinutes == 0) 
+	{
+		current_On_Time = on_Time;
+	}
+	else 
+	{
+		current_On_Time = (uint32_t)currentOnMinutes * 60000;
+	}
+
+	if (currentOffMinutes == 0) 
+	{
+		current_Off_Time = off_Time;
+	}
+	else 
+	{
+		current_Off_Time = (uint32_t)currentOffMinutes * 60000;
+	}
 }
 
-void SaveSetTimersToEEPROM() 
+void SaveTimersToEEPROM() 
 {
-	setTimerEEPROMPosition += 4;
-	
-	if (setTimerEEPROMPosition >= 24) 
+	currentEEPPROMposition += 14;
+
+	if (currentEEPPROMposition >= 1009) 
 	{
-		setTimerEEPROMPosition = 0;
-		setTimerSentinelBit ^= 1;
+		// StartFromBeginning
+		currentEEPPROMposition = 0;
 	}
 
-	// include the sentinel bit
-	uint16_t sentinelBit = setTimerSentinelBit;
-	sentinelBit = sentinelBit << 15;
-	uint16_t onTimerToEEPROM = (uint16_t)(on_Time / 60000) + sentinelBit;
+	//Erase previous position indicator
+	EEPROM.write(currentEEPPROMposition - 14, 0);
 
-	EEPROM.put(setTimerEEPROMPosition, onTimerToEEPROM);
-	EEPROM.put(setTimerEEPROMPosition + 2, (uint16_t)(off_Time / 60000));
-}
+	uint32_t setOn_ = on_Time;
+	uint32_t setOff_ = off_Time;
+	uint16_t currentOnMinutes = current_On_Time / 60000;
+	uint16_t currentOffMinutes = current_Off_Time / 60000;
+	uint8_t activeState = currentTimerOnOFFState;
 
-// the remaining of the EEPROM will be used for active timers
-void LoadActiveTimersAndLastONOFFstateFromEEPROM() 
-{
-	// initial value for the sentinel bit at EEPROM start
-	activeTimerSentinelBit = EEPROM.read(24) >> 7;
-	activeTimerEEPROMPosition = 24;
-
-	for (uint8_t i = 28; i < 1024; i += 4)
-	{
-		if (EEPROM.read(i) >> 7 != activeTimerSentinelBit)
-		{
-			activeTimerEEPROMPosition = i - 4;
-			break;
-		}
-
-		// If all sentinel bits are the same, flip the current
-		activeTimerSentinelBit ^= 1;
-	}
-
-	uint16_t OnTimerFromEEPROM;
-	uint16_t OffTimerFromEEPROM;
-	EEPROM.get(setTimerEEPROMPosition, OnTimerFromEEPROM);
-	EEPROM.get(setTimerEEPROMPosition + 2, OffTimerFromEEPROM);
-
-	//Remove the sentinel bit
-	OnTimerFromEEPROM = (OnTimerFromEEPROM << 1) >> 1;
-
-	// Set Active state to the data from EEPROM
-	lastActiveState = OffTimerFromEEPROM >> 15;
-
-	//Remove the On/Off state bit
-	OffTimerFromEEPROM = (OffTimerFromEEPROM << 1) >> 1;
-
-	current_On_Time = OnTimerFromEEPROM * 60000;
-	current_Off_Time = OffTimerFromEEPROM * 60000;
-}
-
-void SaveActiveTimersToEEPROM()
-{
-	activeTimerEEPROMPosition += 4;
-
-	if (activeTimerEEPROMPosition >= 1021)
-	{
-		activeTimerEEPROMPosition = 0;
-		activeTimerSentinelBit ^= 1;
-	}
-
-	// include the sentinel bit
-	uint16_t sentinelBit = activeTimerSentinelBit;
-	sentinelBit = sentinelBit << 15;
-	uint16_t onTimerToEEPROM = on_Time + sentinelBit;
-
-	EEPROM.put(activeTimerEEPROMPosition, onTimerToEEPROM);
-
-
-	uint8_t activePosition = currentTimerOnOFFState;
-
-	if (activePosition != 0 || activePosition != 1) 
-	{
-		activePosition = 0;
-	}
-
-	activePosition = activePosition << 15;
-
-	uint16_t offTimerToEEPROM = (uint16_t)(current_Off_Time / 60000) + activePosition;
-	EEPROM.put(activeTimerEEPROMPosition + 2, (uint16_t)(offTimerToEEPROM / 60000));
+	//Mark current position
+	EEPROM.write(currentEEPPROMposition, 255);
+	//Put data into EEPROM
+	EEPROM.put(currentEEPPROMposition + 1, activeState);
+	EEPROM.put(currentEEPPROMposition + 2, setOn_);
+	EEPROM.put(currentEEPPROMposition + 6, setOff_);
+	EEPROM.put(currentEEPPROMposition + 10, currentOnMinutes);
+	EEPROM.put(currentEEPPROMposition + 12, currentOffMinutes);
 }

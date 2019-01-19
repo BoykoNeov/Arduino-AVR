@@ -41,12 +41,9 @@ uint32_t setMenuTimer = 10000;
 // Used for when setting for the first time, also change the current timer values
 bool setForTheFirstTime = true;
 
-uint8_t setTimerEEPROMPosition = 0;
-uint8_t setTimerSentinelBit = 0;
-uint8_t activeTimerSentinelBit = 0;
-uint16_t activeTimerEEPROMPosition = 25;
-uint32_t setOnTimerValueFromEEPROM = 0;
-uint32_t setOffTimerValueFROMEEPROM = 0;
+//EEPROM values
+uint16_t currentEEPPROMposition = 0;
+uint32_t EEPROMwriteTimer = 30000;
 
 // left pointing dense arrow 
 const byte customChar[] PROGMEM = {
@@ -74,6 +71,7 @@ const byte customChar2[] PROGMEM = {
 
 void setup()
 {
+	//Serial.begin(9600);
 	delay(60);
 	lcd.begin(16, 2);
 	delay(60);
@@ -93,9 +91,8 @@ void setup()
 	lcd.createChar(0, customCharOne);
 	lcd.createChar(1, downArrow);
 
-	// Load Set Timers from EEPROM, set the set timer EEPROM position and sentinel bit and set the active timers to set timers
-	LoadSetTimersFromEEPROM();
-	
+	ReadTimersFromEEPROM();
+
 	lcd.setCursor(0, 0);
 	lcd.print("PRESS ANY KEY TO");
 	lcd.setCursor(0, 1);
@@ -103,11 +100,11 @@ void setup()
 
 	uint32_t StartTimer = millis();
 
-	while (!anyKeyPressed && millis() - StartTimer < 10000) 
+	while (!anyKeyPressed && millis() - StartTimer < 10000)
 	{
 		uint8_t readKey = read_LCD_buttons();
 
-		if (readKey != btnNONE) 
+		if (readKey != btnNONE)
 		{
 			anyKeyPressed = true;
 			delay(200);
@@ -116,15 +113,13 @@ void setup()
 	}
 
 	lcd.clear();
-	LoadSetTimersFromEEPROM();
-	setOnTimerValueFromEEPROM = on_Time;
-	setOffTimerValueFROMEEPROM = off_Time;
 }
 
 void loop()
 {
 	// Change Timers
 	uint32_t currentMillis = millis();
+
 	if (currentMillis - millisOfLastTimeChange >= 1000)
 	{
 		millisOfLastTimeChange = currentMillis;
@@ -153,22 +148,39 @@ void loop()
 				currentTimerOnOFFState = 0;
 			}
 		}
-		else if (currentTimerOnOFFState == 2) 
+		else if (currentTimerOnOFFState == 2)
 		{
-			if (setMenuTimer > 1000) 
+			if (setMenuTimer > 1000)
 			{
 				setMenuTimer -= 1000;
 			}
-			else 
+			else
 			{
 				setMenuTimer = 10000;
-				currentTimerOnOFFState = lastActiveState;
+
+				if (!anyKeyPressed)
+				{
+					currentTimerOnOFFState = lastActiveState;
+				}
+				else
+				{
+					currentTimerOnOFFState = 1;
+				}
 			}
+		}
+
+		if (EEPROMwriteTimer > 1000)
+		{
+			EEPROMwriteTimer -= 1000;
+		}
+		else
+		{
+			EEPROMwriteTimer = 0;
 		}
 	}
 
 	// When time was initialy set, active timers are no longer modified together with set timers
-	if (currentTimerOnOFFState != 2) 
+	if (currentTimerOnOFFState != 2)
 	{
 		setForTheFirstTime = false;
 	}
@@ -180,11 +192,11 @@ void loop()
 		lcd.print(" ");
 
 		// If no key was pressued durring start, we assume a power down startup
-		if (!anyKeyPressed) 
-		{		
+		if (!anyKeyPressed)
+		{
 			lcd.write(uint8_t(1));
 		}
-		else 
+		else
 		{
 			lcd.print(" ");
 		}
@@ -226,7 +238,7 @@ void loop()
 		lcd.print(":");
 		PrintNumericValue(currentRemainingOFFSeconds);
 	} // if timers are not running the timer reset time is displayed and modified
-	else 
+	else
 	{
 		lcd.setCursor(0, 0);
 
@@ -326,14 +338,14 @@ void loop()
 		uint32_t newValue = 0;
 		uint32_t *pointer_to_currently_displayed_timers;
 
-		if (currentTimerOnOFFState != 2) 
+		if (currentTimerOnOFFState != 2)
 		{
 			// if timers on not running, modify the current timer values
 			// pointer points to curren on time
 			pointer_to_currently_displayed_timers = &current_On_Time;
 			ResetSetMenuTimer();
 		}
-		else 
+		else
 		{
 			// else modify reset values
 			pointer_to_currently_displayed_timers = &on_Time;
@@ -481,7 +493,7 @@ void loop()
 	}
 	}
 
-	if (lcd_key != btnNONE) 
+	if (lcd_key != btnNONE)
 	{
 		// If this is the first modification to the timers also change the active timer values
 		SetActiveTimerToSetTimerWhenFirstModification();
@@ -490,10 +502,9 @@ void loop()
 		ResetSetMenuTimer();
 	}
 
-	if (currentTimerOnOFFState != 2 && (off_Time != setOffTimerValueFROMEEPROM || on_Time != setOnTimerValueFromEEPROM)) 
+	if (EEPROMwriteTimer == 0)
 	{
-		off_Time = setOffTimerValueFROMEEPROM;
-		on_Time = setOnTimerValueFromEEPROM;
-		SaveSetTimersToEEPROM();
+		SaveTimersToEEPROM();
+		EEPROMwriteTimer = 300000;
 	}
 }

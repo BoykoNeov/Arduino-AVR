@@ -28,7 +28,7 @@ uint32_t timeChangeMultiplier = 1;
 
 uint8_t currentTimerOnOFFState = 2; // 1 on, 0 off, 2 - off , timers not counting
 
-uint8_t lastActiveState = 1; //TODO read from EEPROM
+uint8_t lastActiveState = 0; // Later to be replaced with data from EEPROM
 
 uint32_t millisOfLastTimeChange = 0;
 
@@ -43,7 +43,7 @@ bool setForTheFirstTime = true;
 
 //EEPROM values
 uint16_t currentEEPPROMposition = 0;
-uint32_t EEPROMwriteTimer = 30000;
+uint32_t EEPROMwriteTimer = 300000;
 
 // left pointing dense arrow 
 const byte customChar[] PROGMEM = {
@@ -112,6 +112,7 @@ void setup()
 		}
 	}
 
+	pinMode(2, OUTPUT);
 	lcd.clear();
 }
 
@@ -157,15 +158,7 @@ void loop()
 			else
 			{
 				setMenuTimer = 10000;
-
-				if (!anyKeyPressed)
-				{
-					currentTimerOnOFFState = lastActiveState;
-				}
-				else
-				{
-					currentTimerOnOFFState = 1;
-				}
+				currentTimerOnOFFState = lastActiveState;
 			}
 		}
 
@@ -177,6 +170,16 @@ void loop()
 		{
 			EEPROMwriteTimer = 0;
 		}
+	}
+
+	//Set the output
+	if (currentTimerOnOFFState == 0)
+	{
+		digitalWrite(2, LOW);
+	}
+	else if (currentTimerOnOFFState == 1)
+	{
+		digitalWrite(2, HIGH);
 	}
 
 	// When time was initialy set, active timers are no longer modified together with set timers

@@ -1,0 +1,9 @@
+1. upload esp_ota_arduino.ini (with modified wifi access data) by cable
+
+2. you can see the ip address through the seial (just to confirm connection)
+
+3. select the ip address from port
+
+4. upload the modified version through wifi
+
+5. the esp should start blinking

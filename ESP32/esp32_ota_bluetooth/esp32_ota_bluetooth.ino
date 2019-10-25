@@ -5,6 +5,7 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "BluetoothSerial.h"
+#include "Passwords.h"
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -19,7 +20,8 @@ BluetoothSerial SerialBT;
 
 void setup() 
 {
-  AssignWifiPassword();
+  ssid = current_ssid;
+  password = current_password;
   Serial.begin(115200);
   Serial.println("Booting");
   WiFi.mode(WIFI_STA);

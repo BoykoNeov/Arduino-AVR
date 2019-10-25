@@ -2,7 +2,8 @@
 ## Eclipse
 #################
 #ignore passwords file
-ESP32/esp32_ota_bluetooth/Passwords.ino
+ESP32/esp32_ota_bluetooth/Passwords.h
+ESP8266/esp8266ServerExample/Passwords.h
 
 *.sln
 *.pydevproject

@@ -4,6 +4,7 @@
 <style>
 .grid-container {
   display: grid;
+  width:750px;
   grid-gap: 5px;
   grid-template-columns: 70px 70px 70px 70px 70px 70px 70px 70px 70px 70px;
   background-color: #2196F3;
@@ -229,6 +230,12 @@ output3.innerHTML = this.value;
       return red+green+blue;
     };
 </script>
+
+<script>
+  var redArray = [];
+  var greenArray = [];
+  var blueArray = [];
+</script>
     
 <script>
       var grid = document.getElementsByClassName('grid-item');
@@ -238,6 +245,11 @@ output3.innerHTML = this.value;
         var green = document.getElementById("myRange2").value;
         var blue = document.getElementById("myRange3").value;
         var currentColor = fullColorHex(red, green, blue);
+
+        var vNum = parseInt(v.innerHTML);
+        redArray[vNum - 1] = red;
+        greenArray[vNum - 1] = green;
+        blueArray[vNum - 1] = blue;
 
         v.style.background = "#" + currentColor;
       }));

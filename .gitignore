@@ -3,6 +3,7 @@
 #################
 #ignore passwords file
 ESP32/esp32_ota_bluetooth/Passwords.h
+ESP32/esp32_input_html_form_spiffs/Passwords.h
 ESP8266/esp8266ServerExample/Passwords.h
 
 *.sln

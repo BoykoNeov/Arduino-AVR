@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.grid-container {
+  display: grid;
+  grid-gap: 5px;
+  grid-template-columns: 70px 70px 70px 70px 70px 70px 70px 70px 70px 70px;
+  background-color: #2196F3;
+  padding: 5px;
+}
+
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(0, 0, 0, 0.8);
+  height: 50px;
+  width: 50px;
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.slidecontainer {
+  width: 500px;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+<h1>The grid-gap Property:</h1>
+
+<div class="grid-container">
+    <div class="grid-item">1</div>
+    <div class="grid-item">2</div>
+    <div class="grid-item">3</div>  
+    <div class="grid-item">4</div>
+    <div class="grid-item">5</div>
+    <div class="grid-item">6</div>  
+    <div class="grid-item">7</div>
+    <div class="grid-item">8</div>
+    <div class="grid-item">9</div>
+    <div class="grid-item">10</div>
+    <div class="grid-item">11</div>
+    <div class="grid-item">12</div>
+    <div class="grid-item">13</div>  
+    <div class="grid-item">14</div>
+    <div class="grid-item">15</div>
+    <div class="grid-item">16</div>  
+    <div class="grid-item">17</div>
+    <div class="grid-item">18</div>
+    <div class="grid-item">19</div>
+    <div class="grid-item">20</div>
+    <div class="grid-item">21</div>
+    <div class="grid-item">22</div>
+    <div class="grid-item">23</div>  
+    <div class="grid-item">24</div>
+    <div class="grid-item">25</div>
+    <div class="grid-item">26</div>  
+    <div class="grid-item">27</div>
+    <div class="grid-item">28</div>
+    <div class="grid-item">29</div>
+    <div class="grid-item">30</div>
+    <div class="grid-item">31</div>
+    <div class="grid-item">32</div>
+    <div class="grid-item">33</div>  
+    <div class="grid-item">34</div>
+    <div class="grid-item">35</div>
+    <div class="grid-item">36</div>  
+    <div class="grid-item">37</div>
+    <div class="grid-item">38</div>
+    <div class="grid-item">39</div>
+    <div class="grid-item">40</div>
+    <div class="grid-item">41</div>
+    <div class="grid-item">42</div>
+    <div class="grid-item">43</div>  
+    <div class="grid-item">44</div>
+    <div class="grid-item">45</div>
+    <div class="grid-item">46</div>  
+    <div class="grid-item">47</div>
+    <div class="grid-item">48</div>
+    <div class="grid-item">49</div>
+    <div class="grid-item">50</div>
+    <div class="grid-item">51</div>
+    <div class="grid-item">52</div>
+    <div class="grid-item">53</div>  
+    <div class="grid-item">54</div>
+    <div class="grid-item">55</div>
+    <div class="grid-item">56</div>  
+    <div class="grid-item">57</div>
+    <div class="grid-item">58</div>
+    <div class="grid-item">59</div>
+    <div class="grid-item">60</div>
+    <div class="grid-item">61</div>
+    <div class="grid-item">62</div>
+    <div class="grid-item">63</div>  
+    <div class="grid-item">64</div>
+    <div class="grid-item">65</div>
+    <div class="grid-item">66</div>  
+    <div class="grid-item">67</div>
+    <div class="grid-item">68</div>
+    <div class="grid-item">69</div>
+    <div class="grid-item">70</div>
+    <div class="grid-item">71</div>
+    <div class="grid-item">72</div>
+    <div class="grid-item">73</div>  
+    <div class="grid-item">74</div>
+    <div class="grid-item">75</div>
+    <div class="grid-item">76</div>  
+    <div class="grid-item">77</div>
+    <div class="grid-item">78</div>
+    <div class="grid-item">79</div>
+    <div class="grid-item">80</div>
+    <div class="grid-item">81</div>
+    <div class="grid-item">82</div>
+    <div class="grid-item">83</div>  
+    <div class="grid-item">84</div>
+    <div class="grid-item">85</div>
+    <div class="grid-item">86</div>  
+    <div class="grid-item">87</div>
+    <div class="grid-item">88</div>
+    <div class="grid-item">89</div>
+    <div class="grid-item">90</div>
+    <div class="grid-item">91</div>
+    <div class="grid-item">92</div>
+    <div class="grid-item">93</div>  
+    <div class="grid-item">94</div>
+    <div class="grid-item">95</div>
+    <div class="grid-item">96</div>  
+    <div class="grid-item">97</div>
+    <div class="grid-item">98</div>
+    <div class="grid-item">99</div>
+    <div class="grid-item">100</div>
+</div>
+
+<h1>Custom Range Slider 1</h1>
+
+<div class="slidecontainer">
+  <input type="range" min="0" max="255" value="10" class="slider" id="myRange">
+  <p>Value: <span id="demo"></span></p>
+</div>
+
+<div class="slidecontainer">
+        <input type="range" min="0" max="255" value="10" class="slider" id="myRange2">
+        <p>Value: <span id="demo2"></span></p>
+</div>
+
+<div class="slidecontainer">
+            <input type="range" min="0" max="255" value="10" class="slider" id="myRange3">
+            <p>Value: <span id="demo3"></span></p>
+</div>
+
+<script>
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+}
+</script>
+
+<script>
+var slider2 = document.getElementById("myRange2");
+var output2 = document.getElementById("demo2");
+output2.innerHTML = slider2.value;
+
+slider2.oninput = function() {
+output2.innerHTML = this.value;
+}
+</script>
+
+<script>
+var slider3 = document.getElementById("myRange3");
+var output3 = document.getElementById("demo3");
+output3.innerHTML = slider3.value;
+
+slider3.oninput = function() {
+output3.innerHTML = this.value;
+}
+</script>
+
+<script>
+    var rgbToHex = function (rgb) { 
+    var hex = Number(rgb).toString(16);
+    if (hex.length < 2) {
+         hex = "0" + hex;
+    }
+    return hex;
+  };
+</script>
+
+<script>
+      var fullColorHex = function(r,g,b) {   
+      var red = rgbToHex(r);
+      var green = rgbToHex(g);
+      var blue = rgbToHex(b);
+      return red+green+blue;
+    };
+</script>
+    
+<script>
+      var grid = document.getElementsByClassName('grid-item');
+      Array.from(grid).forEach(v => v.addEventListener('click', function() 
+      {
+        var red = document.getElementById("myRange").value;
+        var green = document.getElementById("myRange2").value;
+        var blue = document.getElementById("myRange3").value;
+        var currentColor = fullColorHex(red, green, blue);
+
+        v.style.background = "#" + currentColor;
+      }));
+</script>
+
+</body>
+</html>

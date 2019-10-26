@@ -168,16 +168,16 @@ void setup() {
 
 void loop() {
   // To access your stored values on inputString, inputInt, inputFloat
-  String yourInputString = readFile(SPIFFS, "/inputString.txt");
-  Serial.print("*** Your inputString: ");
-  Serial.println(yourInputString);
-  
-  int yourInputInt = readFile(SPIFFS, "/inputInt.txt").toInt();
-  Serial.print("*** Your inputInt: ");
-  Serial.println(yourInputInt);
-  
-  float yourInputFloat = readFile(SPIFFS, "/inputFloat.txt").toFloat();
-  Serial.print("*** Your inputFloat: ");
-  Serial.println(yourInputFloat);
-  delay(5000);
+//  String yourInputString = readFile(SPIFFS, "/inputString.txt");
+//  Serial.print("*** Your inputString: ");
+//  Serial.println(yourInputString);
+//  
+//  int yourInputInt = readFile(SPIFFS, "/inputInt.txt").toInt();
+//  Serial.print("*** Your inputInt: ");
+//  Serial.println(yourInputInt);
+//  
+//  float yourInputFloat = readFile(SPIFFS, "/inputFloat.txt").toFloat();
+//  Serial.print("*** Your inputFloat: ");
+//  Serial.println(yourInputFloat);
+//  delay(5000);
 }

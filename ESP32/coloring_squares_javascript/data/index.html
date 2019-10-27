@@ -1,66 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-.grid-container {
-  display: grid;
-  width:750px;
-  grid-gap: 5px;
-  grid-template-columns: 70px 70px 70px 70px 70px 70px 70px 70px 70px 70px;
-  background-color: #2196F3;
-  padding: 5px;
-}
-
-.grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 2px solid rgba(0, 0, 0, 0.8);
-  height: 50px;
-  width: 50px;
-  padding: 10px;
-  font-size: 30px;
-  text-align: center;
-}
-
-.slidecontainer {
-  width: 500px;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 25px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-}
-
-.slider:hover {
-  opacity: 1;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 25px;
-  height: 25px;
-  background: #4CAF50;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: #4CAF50;
-  cursor: pointer;
-}
-
-</style>
+<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-
-<h1>The grid-gap Property:</h1>
 
 <div class="grid-container">
     <div class="grid-item">1</div>
@@ -165,54 +108,55 @@
     <div class="grid-item">100</div>
 </div>
 
-<h1>Custom Range Slider 1</h1>
+<h1>Red:</h1>
 
 <div class="slidecontainer">
-  <input type="range" min="0" max="255" value="10" class="slider" id="myRange">
-  <p>Value: <span id="demo"></span></p>
+  <input type="range" min="0" max="255" value="10" class="slider" id="redRange">
+  <p>Value: <span id="redValue"></span></p>
 </div>
 
-<div class="slidecontainer">
-        <input type="range" min="0" max="255" value="10" class="slider" id="myRange2">
-        <p>Value: <span id="demo2"></span></p>
-</div>
+<h1>Green:</h1>
 
 <div class="slidecontainer">
-            <input type="range" min="0" max="255" value="10" class="slider" id="myRange3">
-            <p>Value: <span id="demo3"></span></p>
+        <input type="range" min="0" max="255" value="10" class="slider" id="greenRange">
+        <p>Value: <span id="greenValue"></span></p>
+</div>
+
+<h1>Blue:</h1>
+
+<div class="slidecontainer">
+            <input type="range" min="0" max="255" value="10" class="slider" id="blueRange">
+            <p>Value: <span id="blueValue"></span></p>
 </div>
 
 <script>
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
+var slider = document.getElementById("redRange");
+var output = document.getElementById("redValue");
 output.innerHTML = slider.value;
 
-slider.oninput = function() {
+slider.oninput = function() 
+  {
   output.innerHTML = this.value;
-}
-</script>
+  }
 
-<script>
-var slider2 = document.getElementById("myRange2");
-var output2 = document.getElementById("demo2");
+var slider2 = document.getElementById("greenRange");
+var output2 = document.getElementById("greenValue");
 output2.innerHTML = slider2.value;
 
-slider2.oninput = function() {
-output2.innerHTML = this.value;
-}
-</script>
+slider2.oninput = function() 
+  {
+  output2.innerHTML = this.value;
+  }
 
-<script>
-var slider3 = document.getElementById("myRange3");
-var output3 = document.getElementById("demo3");
+var slider3 = document.getElementById("blueRange");
+var output3 = document.getElementById("blueValue");
 output3.innerHTML = slider3.value;
 
-slider3.oninput = function() {
-output3.innerHTML = this.value;
-}
-</script>
+slider3.oninput = function() 
+  {
+  output3.innerHTML = this.value;
+  }
 
-<script>
     var rgbToHex = function (rgb) { 
     var hex = Number(rgb).toString(16);
     if (hex.length < 2) {
@@ -220,30 +164,24 @@ output3.innerHTML = this.value;
     }
     return hex;
   };
-</script>
 
-<script>
       var fullColorHex = function(r,g,b) {   
       var red = rgbToHex(r);
       var green = rgbToHex(g);
       var blue = rgbToHex(b);
       return red+green+blue;
     };
-</script>
 
-<script>
   var redArray = [];
   var greenArray = [];
   var blueArray = [];
-</script>
-    
-<script>
+
       var grid = document.getElementsByClassName('grid-item');
       Array.from(grid).forEach(v => v.addEventListener('click', function() 
       {
-        var red = document.getElementById("myRange").value;
-        var green = document.getElementById("myRange2").value;
-        var blue = document.getElementById("myRange3").value;
+        var red = document.getElementById("redRange").value;
+        var green = document.getElementById("greenRange").value;
+        var blue = document.getElementById("blueRange").value;
         var currentColor = fullColorHex(red, green, blue);
 
         var vNum = parseInt(v.innerHTML);
